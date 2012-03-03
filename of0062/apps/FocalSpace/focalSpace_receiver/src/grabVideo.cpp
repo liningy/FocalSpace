@@ -622,7 +622,8 @@ HRESULT KinectGrabber::DShowRecord(IMediaObject* pDMO, IPropertyStore* pPS)
 		if(SUCCEEDED(hr))
 		{
 			// Map the width sound angle to a pixel
-			soundPixel = max( min(640, (dAngle + 0.33) * VIDEO_WIDTH), 0);
+			if(dAngle!=0) soundPixel = max( min(640, (dAngle + 0.33) * VIDEO_WIDTH), 0);
+			else soundPixel=1000; //set to a random big number
 			printf("------------------------------------------\n");
 			printf(" sound \n");
 			printf("------------------------------------------\n");

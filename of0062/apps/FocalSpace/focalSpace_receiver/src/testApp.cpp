@@ -148,27 +148,31 @@ void testApp::update(){
 	
 	// TODO: move this somewhere else. Probably goes in the conference.cpp file?
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
-	double minSoundDiscrepancy = 100;
+	double minSoundDiscrepancy = 50;
 	bool personSpeaking = false;
 	printf("-------------------------------------------\n"); 
 	printf(" Head Positions \n"); 
 	printf("-------------------------------------------\n"); 
 	
 	bool peopleSelectedbyMouse[6];
-	// Loop through all of the 
+	// Loop through all of the minSoundDiscrepancy
 	for (int i = 0; i < 6; i ++) { 
 	// TODO: value should be some constant indicating number of skeletons
 		
 		// print out the x values for each of the players head tracking
-		printf("head %d x value: %d \n", i, g_kinectGrabber.headXValues[i]);
+		//printf("head %d x value: %d \n", i, g_kinectGr abber.headXValues[i]);
+		//printf("soundPixel %d x value: %f \n", i, g_kinectGrabber.soundPixel);
 
 		// compare to find the reading with the smallest discrepancy from the sound localization
 		double discrepancy = abs(g_kinectGrabber.headXValues[i] - g_kinectGrabber.soundPixel);
+		printf("discrepancy %d x value: %f \n", i, discrepancy);
 		if (discrepancy < minSoundDiscrepancy) {
 			minSoundDiscrepancy = discrepancy;
 			g_kinectGrabber.minDiscrepancyIdx = i;
 			personSpeaking = true;
-		} 
+		}else{
+			//g_kinectGrabber.minDiscrepancyIdx = 7; //just a random number out of 1 ~ 6
+		}
 
 		//talk bubbles update
 		int headPositionX = g_kinectGrabber.rightShoulderXValues[i]+25;
