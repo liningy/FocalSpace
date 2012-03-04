@@ -20,6 +20,7 @@
 #include "gesture.h"
 
 //const int DEPTH_THRESHOLD = 350;
+const  int Num_Kinects = 3;
 class testApp : public ofBaseApp{
 	
 	public:
@@ -106,6 +107,8 @@ class testApp : public ofBaseApp{
 		ofxUDPManager udpConnection;
 		ofTrueTypeFont  mono;
 		ofTrueTypeFont  monosm;
+		//bool            isScreenActive;
+		//int             activateSkeltonTrack[Num_Kinects];
 		
 };
 

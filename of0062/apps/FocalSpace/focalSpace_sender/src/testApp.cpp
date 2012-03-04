@@ -152,7 +152,7 @@ void testApp::update(){
 	
 	// TODO: move this somewhere else. Probably goes in the conference.cpp file?
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
-	double minSoundDiscrepancy = 100;
+	double minSoundDiscrepancy = 50;
 	bool personSpeaking = false;
 	printf("-------------------------------------------\n"); 
 	printf(" Head Positions \n"); 

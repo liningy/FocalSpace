@@ -35,7 +35,7 @@ void conference_update() {
 		blurBuff - RGBA values of the blurred/blacked out image to paint over the focusBuff values
 */
 
-void focusRGB(BYTE* videoBuff, USHORT* depthBuff, BYTE * focusBuff, BYTE* blurBuff, KinectGrabber* kinectGrabber,  bool focusMode, bool blackMode, bool zoomMode, float maskValue, int closestID, bool personSpeaking) {
+void focusRGB(BYTE* videoBuff, USHORT* depthBuff, BYTE * focusBuff, BYTE* blurBuff, KinectGrabber* kinectGrabber,  bool focusMode, bool blackMode, bool zoomMode, float maskValue) {
 
 	if (videoBuff && depthBuff) {
 		LONG* pcolorx = new LONG();
@@ -75,7 +75,7 @@ void focusRGB(BYTE* videoBuff, USHORT* depthBuff, BYTE * focusBuff, BYTE* blurBu
 				}
 				// Determine which pixels on the blur layer should be visible.
 				// If there are any detected skeletons, we want to focus in on one of them
-				if (kinectGrabber->minDiscrepancyIdx >= 0 &&  kinectGrabber->minDiscrepancyIdx <= 6 && kinectGrabber->minDiscrepancyIdx == closestID && personSpeaking)
+				if (kinectGrabber->minDiscrepancyIdx >= 0 &&  kinectGrabber->minDiscrepancyIdx <= 6)
 				//TODO: change the 6 to some constant indicating that total number of skeletons, like NUI_SKELETON_COUNT
 				{
 					

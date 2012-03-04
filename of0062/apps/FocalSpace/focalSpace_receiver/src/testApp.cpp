@@ -149,7 +149,8 @@ void testApp::update(){
 	// TODO: move this somewhere else. Probably goes in the conference.cpp file?
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
 	double minSoundDiscrepancy = 50;
-	bool personSpeaking = false;
+	//bool personSpeaking = false;
+	g_kinectGrabber.minDiscrepancyIdx=7;
 	printf("-------------------------------------------\n"); 
 	printf(" Head Positions \n"); 
 	printf("-------------------------------------------\n"); 
@@ -169,7 +170,7 @@ void testApp::update(){
 		if (discrepancy < minSoundDiscrepancy) {
 			minSoundDiscrepancy = discrepancy;
 			g_kinectGrabber.minDiscrepancyIdx = i;
-			personSpeaking = true;
+			//personSpeaking = true;
 		}else{
 			//g_kinectGrabber.minDiscrepancyIdx = 7; //just a random number out of 1 ~ 6
 		}
@@ -204,12 +205,12 @@ void testApp::update(){
 	} else {
 		closestID=0;
 	}
-	printf(" closest person : %i \n", closestID); 
-	//printf("confirmed selection?: %s",(confirmSelection)?"true":"false");
+	//printf(" closest person : %i \n", closestID); 
+	//printf("-------------------------------------------\n"); 
+	//printf("skeleton tracked?: %s",	(g_kinectGrabber.isSkeletonTracked)? "true":"false");
 	printf("-------------------------------------------\n"); 
-	printf("skeleton tracked?: %s",	(g_kinectGrabber.isSkeletonTracked)? "true":"false");
+	printf( " minDiscrepancyIdx : %i \n",g_kinectGrabber.minDiscrepancyIdx);
 	printf("-------------------------------------------\n"); 
-
 	
 	///////////////////network stuff//////////////////////////////////
 	char udpMessage[1000];
@@ -221,10 +222,15 @@ void testApp::update(){
 	}else{
 		cout << "////////////////////////////////network:doesn't receive anything" << endl;
 	}
+
+	//order sent out to clients/ not tested
+	//string msg_sent="";
+	//msg_sent+=ofToString(activateSkeltonTrack[0])+"|"+ofToString(activateSkeltonTrack[1])+"|"+ofToString(activateSkeltonTrack[2])+"[/p]";
+	//int sent = udpConnection.Send(msg_sent.c_str(),msg_sent.length());
 	
 	////////////////////network stuff/////////////////////////////////
 	
-	if(buttonPressed[1]) focusRGB(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],maskValue, closestID, personSpeaking);	
+	if(buttonPressed[1]) focusRGB(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],maskValue);	
 	else if(buttonPressed[2] && !confirmSelection) focusRGB_manual(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],mouseX,mouseY);	
 	else if(buttonPressed[2] && confirmSelection)  focusRGB_manualLocked(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],lockedPersonID);	
 	
