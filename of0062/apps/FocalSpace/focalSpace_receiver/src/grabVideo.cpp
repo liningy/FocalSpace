@@ -103,6 +103,52 @@ HRESULT KinectGrabber::Kinect_Init() {
 	m_hNextSkeletonFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );    
 	m_hNextDepthPlayerFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 
+	//modified
+	int KinectCount;
+	MSR_NUIGetDeviceCount(&KinectCount);
+
+	INuiInstance* myInstance;
+	MSR_NuiCreateInstanceByIndex(0,&myInstance);
+
+	myInstance->NuiInitialize( 
+        NUI_INITIALIZE_FLAG_USES_DEPTH |  NUI_INITIALIZE_FLAG_USES_SKELETON | NUI_INITIALIZE_FLAG_USES_COLOR);
+    if( FAILED( hr ) )
+    {
+		printf("failed to inialize nui");
+	}
+	myInstance-> NuiSkeletonTrackingEnable( m_hNextSkeletonFrameEvent, 0 );
+    if( FAILED( hr ) )
+    {
+		printf("failed to open skeleton tracking.");//    MessageBoxResource(m_hWnd,IDS_ERROR_SKELETONTRACKING,MB_OK | MB_ICONHAND);
+        return hr;
+    }
+	myInstance-> NuiImageStreamOpen(
+        NUI_IMAGE_TYPE_COLOR,
+        NUI_IMAGE_RESOLUTION_640x480,
+        0,
+        2,
+        m_hNextVideoFrameEvent,
+        &m_pVideoStreamHandle );
+    if( FAILED( hr ) )
+    {
+		printf("failed to open NuiImagesStream");
+        return hr;
+    }
+	myInstance-> NuiImageStreamOpen(
+        NUI_IMAGE_TYPE_DEPTH,
+        NUI_IMAGE_RESOLUTION_640x480,
+        0,
+        2,
+        m_hNextDepthFrameEvent,
+        &m_pDepthStreamHandle );
+    if( FAILED( hr ) )
+    {
+    	printf("failed to open NuiImagesStream");
+        return hr;
+    }
+
+	//modified
+	/*//original
 	hr = NuiInitialize( 
         NUI_INITIALIZE_FLAG_USES_DEPTH |  NUI_INITIALIZE_FLAG_USES_SKELETON | NUI_INITIALIZE_FLAG_USES_COLOR);
     if( FAILED( hr ) )
@@ -140,6 +186,7 @@ HRESULT KinectGrabber::Kinect_Init() {
         return hr;
     }
 	//return hr;
+	//original*/
 
 	// audio initialization
 	minDiscrepancyIdx=7;  //when skeleton is detected, the number should be between 0 to 6. Set it to a random number beyond this range is OK

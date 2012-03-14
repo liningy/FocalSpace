@@ -120,11 +120,11 @@ void testApp::update(){
 		texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA);
 	}
 
-	/*
+	
 	grayPixels = (BYTE*)g_kinectGrabber.Kinect_getDepthPixels();	
 	if (grayPixels != NULL) {
 		texGray.loadData(grayPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
-	}*/
+	}
 	
 	USHORT* depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
 
@@ -413,6 +413,7 @@ void testApp::draw(){
 	talkBubbles[0]->drawElapsedTime(769,638);
 	talkBubbles[0]->drawDate(769,609);
 	
+	texGray.draw(640,0,DEPTH_WIDTH,DEPTH_HEIGHT);
 }
 //-------------------------------------------------------------
 void testApp::exit(){
