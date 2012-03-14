@@ -112,27 +112,27 @@ public:
 	//---------------------------------------------------------------------/
 	// Audio
 	//---------------------------------------------------------------------/
-		HRESULT					DShowRecord(); // samples audio and reads out the location
-	double soundPixel;                                                            // Pixel approximation of the source of audio. (x dimention)
-	int minDiscrepancyIdx;                                                        // Index of the tracked skeleton that most closely machtes the audio.
+	HRESULT					    DShowRecord();      // samples audio and reads out the location
+	double                      soundPixel;         // Pixel approximation of the source of audio. (x dimention)
+	int                         minDiscrepancyIdx;  // Index of the tracked skeleton that most closely machtes the audio.
 
 	void						recordAudioStart();
 	void						recordAudioInit();
 	void						recordAudioEnd();
-	LPCTSTR szOutputFile;
-	TCHAR szOutfileFullName[MAX_PATH];
-	HANDLE hFile;
-	DWORD writtenWAVHeader;
-	int totalBytesWritten;
-	CStaticMediaBuffer outputBuffer;
-    INuiAudioBeam* pSC;
-	DWORD cOutputBufLen;
-    BYTE *pbOutputBuffer;
-	DMO_OUTPUT_DATA_BUFFER OutputBufferStruct;
-	ULONG cbProduced;
-	DWORD dwStatus;
+	LPCTSTR                     szOutputFile;
+	TCHAR                       szOutfileFullName[MAX_PATH];
+	HANDLE                      hFile;
+	DWORD                       writtenWAVHeader;
+	int                         totalBytesWritten;
+	CStaticMediaBuffer          outputBuffer;
+    INuiAudioBeam*              pSC;
+	DWORD                       cOutputBufLen;
+    BYTE*                       pbOutputBuffer;
+	DMO_OUTPUT_DATA_BUFFER      OutputBufferStruct;
+	ULONG                       cbProduced;
+	DWORD                       dwStatus;
 	
-	bool   audioRecordEnded;                                                    // Index of the tracked skeleton that most closely machtes the audio.
+	bool                        audioRecordEnded;   // Index of the tracked skeleton that most closely machtes the audio.
 	//---------------------------------------------------------------------/
 	//Skeleton tracking
 	//---------------------------------------------------------------------/

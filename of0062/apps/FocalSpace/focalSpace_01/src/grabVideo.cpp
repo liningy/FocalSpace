@@ -237,14 +237,14 @@ HRESULT KinectGrabber::Kinect_Init() {
 	//Nui_SetTrackedSkeletons(0,0);
 	
 	////////////////////////// audio init///////////////////////////////////////
-	/*
+	
 	minDiscrepancyIdx=7;  //when skeleton is detected, the number should be between 0 to 6. Set it to a random number beyond this range is OK
 	hr = S_OK;
     CoInitialize(NULL);
     int  iMicDevIdx = -1; 
 	int  iSpkDevIdx = 0;  //Asume default speakers
     DWORD mmTaskIndex = 0;
-
+	 
     // Set high priority to avoid getting preempted while capturing sound
     mmHandle = AvSetMmThreadCharacteristics(L"Audio", &mmTaskIndex);
     CHECK_BOOL(mmHandle != NULL, "failed to set thread priority\n");
@@ -252,14 +252,14 @@ HRESULT KinectGrabber::Kinect_Init() {
     // DMO initialization
     //CHECKHR(CoCreateInstance(CLSID_CMSRKinectAudio, NULL, CLSCTX_INPROC_SERVER, IID_IMediaObject, (void**)&pDMO));
     //CHECKHR(pDMO->QueryInterface(IID_IPropertyStore, (void**)&pPS));
-
+	printf("..............");
 	INuiAudioBeam* pAudio = NULL;
-    CHECKHR(NuiInitialize(NUI_INITIALIZE_FLAG_USES_AUDIO));
+    //CHECKHR(NuiInitialize(NUI_INITIALIZE_FLAG_USES_AUDIO));
     CHECKHR(NuiGetAudioSource(&pAudio));
     CHECKHR(pAudio->QueryInterface(IID_IMediaObject, (void**)&pDMO));
     CHECKHR(pAudio->QueryInterface(IID_IPropertyStore, (void**)&pPS));
-    SAFE_RELEASE(pAudio);
-
+    //SAFE_RELEASE(pAudio);
+	
 	// Set AEC-MicArray DMO system mode.
     // This must be set for the DMO to work properly
     PROPVARIANT pvSysMode;
@@ -272,12 +272,12 @@ HRESULT KinectGrabber::Kinect_Init() {
     pvSysMode.lVal = (LONG)(2);
     CHECKHR(pPS->SetValue(MFPKEY_WMAAECMA_SYSTEM_MODE, pvSysMode));
     PropVariantClear(&pvSysMode);
-
+	
 	// Tell DMO which capture device to use (we're using whichever device is a microphone array).
     // Default rendering device (speaker) will be used.
     hr = GetMicArrayDeviceIndex(&iMicDevIdx);
     CHECK_RET(hr, "Failed to find microphone array device. Make sure microphone array is properly installed.");
-    
+   
     PROPVARIANT pvDeviceId;
     PropVariantInit(&pvDeviceId);
     pvDeviceId.vt = VT_I4;
@@ -285,7 +285,7 @@ HRESULT KinectGrabber::Kinect_Init() {
     pvDeviceId.lVal = (unsigned long)(iSpkDevIdx<<16) | (unsigned long)(0x0000ffff & iMicDevIdx);
     CHECKHR(pPS->SetValue(MFPKEY_WMAAECMA_DEVICE_INDEXES, pvDeviceId));
     PropVariantClear(&pvDeviceId);
-	*/
+	
 
 	////////////////////////// audio init///////////////////////////////////////
 
@@ -923,11 +923,11 @@ HRESULT hr;
 					
 				// Map the width sound angle to a pixel
 				soundPixel = max( min(640, (dAngle + 0.33) * VIDEO_WIDTH), 0);
-				/*printf("------------------------------------------\n");
+				printf("------------------------------------------\n");
 				printf(" sound \n");
 				printf("------------------------------------------\n");
 				printf("angle %f \n", dAngle);
-				printf("the pixel number corresponding to sound %f \n", soundPixel);*/
+				printf("the pixel number corresponding to sound %f \n", soundPixel);
 
 				}
 			}
