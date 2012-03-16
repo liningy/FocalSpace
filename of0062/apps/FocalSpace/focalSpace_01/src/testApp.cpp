@@ -18,6 +18,7 @@ void testApp::setup(){
 	g_kinectGrabber.Kinect_Init();
 	conference_init();
 	
+	colorAlphaPixels =  g_kinectGrabber.Kinect_getRGBBuffer();//new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	// allocate memory for focus and blur pixels
 	focusPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	blurPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
@@ -96,7 +97,7 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 	ofBackground(bgColor.r,bgColor.g,bgColor.b);
-	//g_kinectGrabber.Kinect_Update();
+	g_kinectGrabber.Kinect_Update();
 	//conference_update();
     
 	// There is a race on m_rgbBuffer. To ensure that the color data is only updated to the front end when the data has been fully copied, we must use a critical section.
@@ -110,9 +111,9 @@ void testApp::update(){
 			if(colorAlphaPixels != NULL) {
 				texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA);
 			}
-			g_kinectGrabber.unlock();
+			//g_kinectGrabber.unlock();
 		}
-		g_kinectGrabber.setWriteTurn(true);
+		//g_kinectGrabber.setWriteTurn(true);
 	}
 
 	
@@ -122,7 +123,7 @@ void testApp::update(){
 	}
 	
 	USHORT* depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
-	printf("pointingPositionZ= %i \n", depthBuff[mouseY*DEPTH_WIDTH+mouseX]);
+	//printf("pointingPositionZ= %i \n", depthBuff[mouseY*DEPTH_WIDTH+mouseX]);
 
 /*
 	if(focusPixels != NULL) {
@@ -143,9 +144,9 @@ void testApp::update(){
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
 	double minSoundDiscrepancy = 50;
 	bool personSpeaking = false;
-	printf("-------------------------------------------\n"); 
-	printf(" Head Positions \n"); 
-	printf("-------------------------------------------\n"); 
+	//printf("-------------------------------------------\n"); 
+	//printf(" Head Positions \n"); 
+	//printf("-------------------------------------------\n"); 
 	
 	bool peopleSelectedbyMouse[6];
 	// Loop through all of the 
@@ -153,7 +154,7 @@ void testApp::update(){
 	// TODO: value should be some constant indicating number of skeletons
 		
 		// print out the x values for each of the players head tracking
-		printf("head %d x value: %d \n", i, g_kinectGrabber.headZValues[i]);
+		//printf("head %d x value: %d \n", i, g_kinectGrabber.headZValues[i]);
 
 		// compare to find the reading with the smallest discrepancy from the sound localization
 		double discrepancy = abs(g_kinectGrabber.headXValues[i] - g_kinectGrabber.soundPixel);
@@ -193,11 +194,11 @@ void testApp::update(){
 	} else {
 		closestID=0;
 	}
-	printf(" closest person : %i \n", closestID); 
+	//printf(" closest person : %i \n", closestID); 
 	//printf("confirmed selection?: %s",(confirmSelection)?"true":"false");
-	printf("-------------------------------------------\n"); 
+	//printf("-------------------------------------------\n"); 
 	printf("skeleton tracked?: %s",	(g_kinectGrabber.isSkeletonTracked)? "true":"false");
-	printf("-------------------------------------------\n"); 
+	//printf("-------------------------------------------\n"); 
 
 	
 	if(buttonPressed[1]) focusRGB(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],maskValue, closestID, personSpeaking);	
@@ -384,6 +385,9 @@ void testApp::draw(){
 
 	texGray.draw(640,0+25,DEPTH_WIDTH,DEPTH_HEIGHT);
 	
+	
+		g_kinectGrabber.unlock();
+		g_kinectGrabber.setWriteTurn(true);
 	
 }
 //-------------------------------------------------------------

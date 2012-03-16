@@ -8,7 +8,6 @@
 #include "grabVideo.h"
 
 
-
 #define SAFE_ARRAYDELETE(p) {if (p) delete[] (p); (p) = NULL;}
 #define SAFE_RELEASE(p) {if (NULL != p) {(p)->Release(); (p) = NULL;}}
 
@@ -30,8 +29,9 @@ HRESULT FixUpChunkSizes(HANDLE hFile, DWORD cbHeader, DWORD cbAudioData);
 
 // Takes in an x and y depth value, returns corresponding x and y  values of the color image
 void KinectGrabber::Kinect_ColorFromDepth(LONG depthX, LONG depthY, LONG *pColorX, LONG *pColorY) {
-	//NuiImageGetColorPixelCoordinatesFromDepthPixel(NUI_IMAGE_RESOLUTION_640x480, NULL, LONG(depthX/2), LONG(depthY/2), m_depthBuffer[depthY*DEPTH_WIDTH + depthX] << 3, pColorX, pColorY); 
+	////NuiImageGetColorPixelCoordinatesFromDepthPixel(NUI_IMAGE_RESOLUTION_640x480, NULL, LONG(depthX/2), LONG(depthY/2), m_depthBuffer[depthY*DEPTH_WIDTH + depthX] << 3, pColorX, pColorY); 
 	NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(NUI_IMAGE_RESOLUTION_640x480,NUI_IMAGE_RESOLUTION_640x480, NULL, LONG(depthX), LONG(depthY), m_depthBuffer[depthY*DEPTH_WIDTH + depthX]<<3, pColorX, pColorY);
+	
 }
 
 // initialize properties to default values
@@ -108,6 +108,8 @@ void CALLBACK KinectGrabber::Kinect_StatusProc( HRESULT hrStatus, const OLECHAR*
 //-------------------------------------------------------------------
 // Initialize reading data from kinect
 HRESULT KinectGrabber::Kinect_Init() {
+	
+	
 	InitializeCriticalSection (&cs);
 	writeTurn = true;
 	HRESULT hr,hr_init_0,hr0,hr_rgb_0;
@@ -128,7 +130,7 @@ HRESULT KinectGrabber::Kinect_Init() {
 
         m_instanceId = m_pNuiSensor->NuiDeviceConnectionId();
     }
-
+	
     m_hNextVideoFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );    
 	m_hNextDepthFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );    
 	//m_hNextSkeletonFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
@@ -152,17 +154,7 @@ HRESULT KinectGrabber::Kinect_Init() {
 		printf("Creation of Kinetic instance  FAILED. \n");
 	}
 
-	/*hr0 = m_pNuiSensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH |  NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX | NUI_INITIALIZE_FLAG_USES_COLOR | NUI_INITIALIZE_FLAG_USES_SKELETON);
-	
-	if (hr0 == S_OK) {	
-		printf("Initialization of Kinect  was successful\n");
-	}
-	else {
-		printf("Initialization of kinetic  failed ! Return code was %d\n",(int)hr0);
-	}*/
-
-
-	hr0 = m_pNuiSensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX | NUI_INITIALIZE_FLAG_USES_COLOR | NUI_INITIALIZE_FLAG_USES_SKELETON);
+	hr0 = m_pNuiSensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX | NUI_INITIALIZE_FLAG_USES_COLOR | NUI_INITIALIZE_FLAG_USES_SKELETON| NUI_INITIALIZE_FLAG_USES_AUDIO);
 
 	if ( E_NUI_SKELETAL_ENGINE_BUSY == hr )
     {
@@ -181,16 +173,7 @@ HRESULT KinectGrabber::Kinect_Init() {
         }
         return hr;
     }
-    /*
-	NUI_INITIALIZE_FLAG_USES_DEPTH |  NUI_INITIALIZE_FLAG_USES_SKELETON | NUI_INITIALIZE_FLAG_USES_COLOR);
 
-	myInstance-> NuiSkeletonTrackingEnable( m_hNextSkeletonFrameEvent, 0 );
-    if( FAILED( hr ) )
-    {
-		printf("failed to open skeleton tracking.");//    MessageBoxResource(m_hWnd,IDS_ERROR_SKELETONTRACKING,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-	*/
 	
 	if ( HasSkeletalEngine( m_pNuiSensor ) )
     {
@@ -231,12 +214,10 @@ HRESULT KinectGrabber::Kinect_Init() {
         return hr;
     }
 	
-	m_hThNuiProcess = CreateThread( NULL, 0, Kinect_Update, this, 0, NULL );
-	m_hEvNuiProcessStop = CreateEvent( NULL, FALSE, FALSE, NULL );
 
-	//Nui_SetApplicationTracking();
-	//Nui_SetTrackedSkeletons(0,0);
+
 	
+
 	////////////////////////// audio init///////////////////////////////////////
 	
 	minDiscrepancyIdx=7;  //when skeleton is detected, the number should be between 0 to 6. Set it to a random number beyond this range is OK
@@ -249,17 +230,17 @@ HRESULT KinectGrabber::Kinect_Init() {
     // Set high priority to avoid getting preempted while capturing sound
     mmHandle = AvSetMmThreadCharacteristics(L"Audio", &mmTaskIndex);
     CHECK_BOOL(mmHandle != NULL, "failed to set thread priority\n");
-
+	
     // DMO initialization
-    //CHECKHR(CoCreateInstance(CLSID_CMSRKinectAudio, NULL, CLSCTX_INPROC_SERVER, IID_IMediaObject, (void**)&pDMO));
+    //CHECKHR(CoCreateInstance(CLSID_CMSRKi new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4]nectAudio, NULL, CLSCTX_INPROC_SERVER, IID_IMediaObject, (void**)&pDMO));
     //CHECKHR(pDMO->QueryInterface(IID_IPropertyStore, (void**)&pPS));
 	printf("..............");
 	INuiAudioBeam* pAudio = NULL;
-    //CHECKHR(NuiInitialize(NUI_INITIALIZE_FLAG_USES_AUDIO));
     CHECKHR(NuiGetAudioSource(&pAudio));
     CHECKHR(pAudio->QueryInterface(IID_IMediaObject, (void**)&pDMO));
     CHECKHR(pAudio->QueryInterface(IID_IPropertyStore, (void**)&pPS));
-    //SAFE_RELEASE(pAudio);
+    SAFE_RELEASE(pAudio);	
+
 	
 	// Set AEC-MicArray DMO system mode.
     // This must be set for the DMO to work properly
@@ -274,6 +255,13 @@ HRESULT KinectGrabber::Kinect_Init() {
     CHECKHR(pPS->SetValue(MFPKEY_WMAAECMA_SYSTEM_MODE, pvSysMode));
     PropVariantClear(&pvSysMode);
 	
+	    DWORD dwWait = 2;
+    while (dwWait > 0)
+    {
+        _tprintf(_T("Device will be ready for recording in %d second(s).\r"), dwWait--);
+        Sleep(1000);
+    }
+	/*
 	// Tell DMO which capture device to use (we're using whichever device is a microphone array).
     // Default rendering device (speaker) will be used.
     hr = GetMicArrayDeviceIndex(&iMicDevIdx);
@@ -286,17 +274,21 @@ HRESULT KinectGrabber::Kinect_Init() {
     pvDeviceId.lVal = (unsigned long)(iSpkDevIdx<<16) | (unsigned long)(0x0000ffff & iMicDevIdx);
     CHECKHR(pPS->SetValue(MFPKEY_WMAAECMA_DEVICE_INDEXES, pvDeviceId));
     PropVariantClear(&pvDeviceId);
-	
+	*/
 
 	////////////////////////// audio init///////////////////////////////////////
+	
 
-    puts("done with initializing kinect sensor, press any key to continue...");
-    _getch();
+	m_hThNuiProcess = CreateThread( NULL, 0, Kinect_Update, this, 0, NULL );
+	m_hEvNuiProcessStop = CreateEvent( NULL, FALSE, FALSE, NULL );
+
+    //puts("done with initializing kinect sensor, press any key to continue...");
+    //_getch();
 
 
 	exit:
     puts(""); 
-
+	return 0;
 }
 
 
@@ -365,11 +357,14 @@ DWORD WINAPI KinectGrabber::Kinect_Update(LPVOID pParam)
 }
 DWORD WINAPI KinectGrabber::Kinect_Update()
 {
+
+	/*
+
 	const int numEvents = 4;
     HANDLE hEvents[numEvents] = { m_hEvNuiProcessStop, m_hNextDepthFrameEvent, m_hNextVideoFrameEvent, m_hNextSkeletonEvent };
     int    nEventIdx;
     DWORD  t;
-
+	
     //m_LastDepthFPStime = timeGetTime( );
 
     //blank the skeleton display on startup
@@ -378,10 +373,14 @@ DWORD WINAPI KinectGrabber::Kinect_Update()
     // Main thread loop
     bool continueProcessing = true;
     while ( continueProcessing )
-    {
+    {*/
         // Wait for any of the events to be signalled
-        nEventIdx = WaitForMultipleObjects( numEvents, hEvents, FALSE, 100 );
-
+        //nEventIdx = WaitForMultipleObjects( numEvents, hEvents, FALSE, 100 );
+		Kinect_GotVideoAlert();
+		Kinect_GotDepthAlert();
+		Kinect_GotSkeletonAlert( );
+        DShowRecord();
+		/*
         // Process signal events
         switch ( nEventIdx )
         {
@@ -392,7 +391,7 @@ DWORD WINAPI KinectGrabber::Kinect_Update()
             case WAIT_OBJECT_0:
                 continueProcessing = false;
                 continue;
-
+				
             case WAIT_OBJECT_0 + 1:
                 Kinect_GotDepthAlert();
                  //++m_DepthFramesTotal;
@@ -405,9 +404,11 @@ DWORD WINAPI KinectGrabber::Kinect_Update()
             case WAIT_OBJECT_0 + 3:
                 Kinect_GotSkeletonAlert( );
                 break;
+				
+			
         }
-
-    }
+		//break;
+    }*/
 
     return 0;
 }
@@ -420,15 +421,15 @@ DWORD WINAPI KinectGrabber::Kinect_Update()
 
 void KinectGrabber::Kinect_GotVideoAlert( )
 {
-    NUI_IMAGE_FRAME pImageFrame;
-	HRESULT hr = m_pNuiSensor->NuiImageStreamGetNextFrame( m_pVideoStreamHandle, 0, &pImageFrame);
+    NUI_IMAGE_FRAME imageFrame;
+	HRESULT hr = m_pNuiSensor->NuiImageStreamGetNextFrame( m_pVideoStreamHandle, 0, &imageFrame);
 
     if ( FAILED( hr ) )
     {
         return;
     }
 
-    INuiFrameTexture * pTexture = pImageFrame.pFrameTexture;
+    INuiFrameTexture * pTexture = imageFrame.pFrameTexture;
     NUI_LOCKED_RECT LockedRect;
     pTexture->LockRect( 0, &LockedRect, NULL, 0 );
 
@@ -454,7 +455,7 @@ void KinectGrabber::Kinect_GotVideoAlert( )
 		writeTurn = false;
 	}
 	pTexture->UnlockRect( 0 );
-	m_pNuiSensor->NuiImageStreamReleaseFrame( m_pVideoStreamHandle, &pImageFrame );
+	m_pNuiSensor->NuiImageStreamReleaseFrame( m_pVideoStreamHandle, &imageFrame );
 }
 
 bool KinectGrabber::getWriteTurn(){
@@ -503,7 +504,7 @@ void KinectGrabber::Kinect_GotDepthAlert( ) {
     {
         return;
     }
-
+	
     INuiFrameTexture * pTexture = imageFrame.pFrameTexture;
     NUI_LOCKED_RECT LockedRect;
     pTexture->LockRect( 0, &LockedRect, NULL, 0 );
@@ -520,15 +521,15 @@ void KinectGrabber::Kinect_GotDepthAlert( ) {
 		        *rgbrun = Kinect_DepthToRGB( *pBufferRun );
 				rgbrun++;
 			   			
-				USHORT RealDepth = (*pBufferRun & 0xfff8) >> 3;
+				USHORT RealDepth = NuiDepthPixelToDepth(*pBufferRun);//(*pBufferRun & 0xfff8) >> 3;
 				//USHORT RealDepth = (*pBufferRun & 0x0fff);	
 				*depthrun=RealDepth;
 				depthrun++;
-
+				/*
 				USHORT Player = *pBufferRun  & 7;
 				*playerrun = Player;
 				playerrun++;
-
+				*/
 				//inc buffer pointer
 				pBufferRun++;
 			}
@@ -538,10 +539,11 @@ void KinectGrabber::Kinect_GotDepthAlert( ) {
     {
         OutputDebugString( L"Buffer length of received texture is bogus\r\n" );
     }
-
+	
     pTexture->UnlockRect( 0 );
+	
+    hr = m_pNuiSensor->NuiImageStreamReleaseFrame( m_pDepthStreamHandle, &imageFrame );
 
-    m_pNuiSensor->NuiImageStreamReleaseFrame( m_pDepthStreamHandle, &imageFrame );
 }
 
 
@@ -689,30 +691,6 @@ void KinectGrabber::getJointsPoints() {
 	shoulderLeft_y=m_Points[4].y;
 	shoulderRight_x=m_Points[8].x;
 	shoulderRight_y=m_Points[8].y;
-}
-
-
-void KinectGrabber::Nui_SetApplicationTracking()
-{
-    if ( HasSkeletalEngine(m_pNuiSensor) )
-    {
-        HRESULT hr = m_pNuiSensor->NuiSkeletonTrackingEnable( m_hNextSkeletonEvent, 0);//NUI_SKELETON_TRACKING_FLAG_TITLE_SETS_TRACKED_SKELETONS);
-        if ( FAILED( hr ) )
-        {
-			printf("error tracking skeleton /n");
-        }
-    }
-}
-
-void KinectGrabber::Nui_SetTrackedSkeletons(int skel1, int skel2)
-{
-    m_TrackedSkeletonIds[0] = skel1;
-    m_TrackedSkeletonIds[1] = skel2;
-    DWORD tracked[NUI_SKELETON_MAX_TRACKED_COUNT] = { skel1, skel2 };
-    if ( FAILED(m_pNuiSensor->NuiSkeletonSetTrackedSkeletons(tracked)) )
-    {
-        printf("error tracking skeleton /n");
-    }
 }
 
 
@@ -890,9 +868,63 @@ exit:
 ///////////////////////////////////////////////////////////////////////////
 HRESULT KinectGrabber::DShowRecord()
 {
-HRESULT hr;
-//#pragma warning(push)
-//#pragma warning(disable: 4127) // conditional expression is constant
+	HRESULT hr;
+
+	
+    pSC = NULL;
+    
+    DWORD cOutputBufLen = 0;
+    BYTE *pbOutputBuffer = NULL;
+
+    WAVEFORMATEX wfxOut = {WAVE_FORMAT_PCM, 1, 16000, 32000, 2, 16, 0};
+    CStaticMediaBuffer outputBuffer;
+    DMO_OUTPUT_DATA_BUFFER OutputBufferStruct = {0};
+    OutputBufferStruct.pBuffer = &outputBuffer;
+    DMO_MEDIA_TYPE mt = {0};
+
+    ULONG cbProduced = 0;
+    DWORD dwStatus;
+
+    // Set DMO output format
+    hr = MoInitMediaType(&mt, sizeof(WAVEFORMATEX));
+    CHECK_RET(hr, "MoInitMediaType failed");
+    
+    mt.majortype = MEDIATYPE_Audio;
+    mt.subtype = MEDIASUBTYPE_PCM;
+    mt.lSampleSize = 0;
+    mt.bFixedSizeSamples = TRUE;
+    mt.bTemporalCompression = FALSE;
+    mt.formattype = FORMAT_WaveFormatEx;	
+    memcpy(mt.pbFormat, &wfxOut, sizeof(WAVEFORMATEX));
+    
+    hr = pDMO->SetOutputType(0, &mt, 0); 
+    CHECK_RET(hr, "SetOutputType failed");
+    MoFreeMediaType(&mt);
+
+    // Allocate streaming resources. This step is optional. If it is not called here, it
+    // will be called when first time ProcessInput() is called. However, if you want to 
+    // get the actual frame size being used, it should be called explicitly here.
+    //hr = pDMO->AllocateStreamingResources();
+    //CHECK_RET(hr, "AllocateStreamingResources failed");
+    
+    // Get actually frame size being used in the DMO. (optional, do as you need)
+    int iFrameSize;
+    PROPVARIANT pvFrameSize;
+    PropVariantInit(&pvFrameSize);
+    CHECKHR(pPS->GetValue(MFPKEY_WMAAECMA_FEATR_FRAME_SIZE, &pvFrameSize));
+    iFrameSize = pvFrameSize.lVal;
+    PropVariantClear(&pvFrameSize);
+
+    // allocate output buffer
+    cOutputBufLen = wfxOut.nSamplesPerSec * wfxOut.nBlockAlign;
+    pbOutputBuffer = new BYTE[cOutputBufLen];
+    CHECK_ALLOC (pbOutputBuffer, "out of memory.\n");
+
+    int totalBytes = 0;
+    
+    hr = pDMO->QueryInterface(IID_INuiAudioBeam, (void**)&pSC);
+    CHECK_RET (hr, "QueryInterface for IID_INuiAudioBeam failed");
+
 
     do{
             outputBuffer.Init((byte*)pbOutputBuffer, cOutputBufLen, 0);
@@ -907,8 +939,8 @@ HRESULT hr;
                 CHECK_RET (hr, "GetBufferAndLength failed");
             }
 			
-			WriteToFile(hFile, pbOutputBuffer, cbProduced);
-			totalBytesWritten += cbProduced;
+			//WriteToFile(hFile, pbOutputBuffer, cbProduced);
+			//totalBytesWritten += cbProduced;
 
             // Obtain beam angle from ISoundSourceLocalizer afforded by microphone array
 			hr = pSC->GetBeam(&dBeamAngle);

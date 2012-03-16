@@ -86,8 +86,7 @@ public:
 	bool                      writeTurn;
 	DWORD                     m_SkeletonIds[NUI_SKELETON_COUNT];
 	DWORD                     m_TrackedSkeletonIds[NUI_SKELETON_MAX_TRACKED_COUNT];
-	void                      Nui_SetApplicationTracking();
-	void                      Nui_SetTrackedSkeletons(int skel1, int skel2);
+
 
 	//---------------------------------------------------------------------/
 	// Sensor Initialization and Update
