@@ -8,6 +8,7 @@
 #include "grabVideo.h"
 
 
+
 #define SAFE_ARRAYDELETE(p) {if (p) delete[] (p); (p) = NULL;}
 #define SAFE_RELEASE(p) {if (NULL != p) {(p)->Release(); (p) = NULL;}}
 
