@@ -1,0 +1,33 @@
+﻿Build started 3/11/2012 10:14:28 PM.
+     1>Project "C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\focalSpace.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "obj\Debug\focalSpace.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         All outputs are up-to-date.
+       ManifestResourceCompile:
+         All outputs are up-to-date.
+       Link:
+         All outputs are up-to-date.
+       Manifest:
+         All outputs are up-to-date.
+       PostBuildEvent:
+         Description: adding DLLs and creating data folder
+         xcopy /e /i /y "C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\*.dll" "C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\bin"
+         if not exist "C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\bin\data" mkdir  "C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\bin\data"
+         
+         :VCEnd
+         C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\fmodex.dll
+         C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\fmodexL.dll
+         C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\FreeImage.dll
+         C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\FreeType-6.dll
+         C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\glut32.dll
+         C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\..\..\..\export\vs2010\Zlib.dll
+         6 File(s) copied
+       FinalizeBuildStatus:
+         Deleting file "obj\Debug\focalSpace.unsuccessfulbuild".
+         Touching "obj\Debug\focalSpace.lastbuildstate".
+     1>Done Building Project "C:\Users\liningy\of0062\apps\FocalSpace\focalSpace_01\focalSpace.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.39
