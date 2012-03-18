@@ -19,6 +19,10 @@
 #include "webRender.h"
 #include "gesture.h"
 
+const int                     RENDER_WIDTH = 540;
+const int                     RENDER_HEIGHT= 405;
+const float                   SCALE=0.844;
+
 //const int DEPTH_THRESHOLD = 350;
 class testApp : public ofBaseApp{
 	

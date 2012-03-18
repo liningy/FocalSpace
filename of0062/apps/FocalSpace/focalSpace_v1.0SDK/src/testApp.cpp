@@ -123,15 +123,6 @@ void testApp::update(){
 	}
 	
 	USHORT* depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
-	//printf("pointingPositionZ= %i \n", depthBuff[mouseY*DEPTH_WIDTH+mouseX]);
-
-/*
-	if(focusPixels != NULL) {
-		
-		adjustOver(2, blurPixels);
-		texBlur.loadData(blurPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
-	}
-	*/
 
     // Gets the joint positions
 	g_kinectGrabber.getJointsPoints();
@@ -168,7 +159,7 @@ void testApp::update(){
 		//talk bubbles update
 		int headPositionX = g_kinectGrabber.rightShoulderXValues[i]+25;
 		int headPositionY = g_kinectGrabber.headYValues[i]-30;
-		talkBubbles[i]->updatePosition(headPositionX*scaleParam,headPositionY*scaleParam);
+		talkBubbles[i]->updatePosition(headPositionX*scaleParam*SCALE+RENDER_WIDTH,headPositionY*scaleParam*SCALE);
 		talkBubbles[i]->updateTimer();
 
 		//manual selection match tracked head; activating talkBubble in manual mode
@@ -226,7 +217,6 @@ void testApp::update(){
 
 
 	sketchShareView.update(g_kinectGrabber.rightHandXValues[closestID]*scaleParam,g_kinectGrabber.rightHandYValues[closestID]*scaleParam,640+20,0+25);
-	//if(buttonPressed[6] && g_kinectGrabber.rightHandXValues[closestID]>500)  sketchShareView.zoomIn=true; //right hand moving right to trigger the moving effect
 
 	if((gesture.last_rhPx!=0) && (gesture.cur_rhPx-gesture.last_rhPx)>100 && buttonPressed[6]){
 		sketchShareView.zoomIn=true;
@@ -234,8 +224,6 @@ void testApp::update(){
 	}else if (((gesture.cur_rhPx-gesture.last_rhPx)<100 && buttonPressed[6]) || (gesture.last_rhPx==0)) {
 		gesture.last_rhPx=gesture.cur_rhPx;
 	}
-
-
 
 	if(buttonPressed[6] && firstTimeSketchTrigger) {
 		sliders[2]->sliderPosX=137;
@@ -246,8 +234,6 @@ void testApp::update(){
 		sketchShareView.close=true;
 		sketchShareView.zoomIn=false;
 	}
-
-	//sketchShareView.setSmallViewOrigin(scaleParam);
 
 	//webRender
 	webRender.updateWebcore();
@@ -260,14 +246,28 @@ void testApp::update(){
 void testApp::draw(){
 	ofEnableSmoothing();
 
-	int blurParam; //different mode has different blurParameter control
-	//float scaleParam;	
-	//for(int i=0;i<3;i++){
-	//	if(buttonPressed[i+3]) blurParam=sliders[i]->value;
-	//}
+	int blurParam=120; //different mode has different blurParameter control
+	scaleParam=1;
 
+
+	//diminished image
+	ofEnableAlphaBlending();
+
+	//draw a layer entirely clear
+	texFocus.draw(0+533,0+25,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //draw the focus texture	  //520*390
+	//draw another blured layer on top, with alpha(skeleton)=0;
+	blur.setBlurParams(4,(float)blurParam/100);
+	blur.beginRender();
+	texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
+	blur.endRender();
+	blur.draw(0+533, 0+25, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
+	ofDisableAlphaBlending();
+
+
+	// ----------------GUI interface: LIVE MODE---------------------------//
+	/*
 	if(buttonPressed[3]) {
-		blurParam=sliders[0]->value;
+		if(sliders[0]->value!=NULL) blurParam=sliders[0]->value;
 		scaleParam=1;
 	}
 	if(buttonPressed[4]) {
@@ -280,63 +280,11 @@ void testApp::draw(){
 		scaleParam=sliders[2]->value;
 	}
 
-	//diminished image
-	ofEnableAlphaBlending();
-	/*
-	if(buttonPressed[5]){
-		ofPushMatrix();
-		ofTranslate(g_kinectGrabber.headXValues[closestID],g_kinectGrabber.headYValues[closestID]);
-		texFocus.draw(0,0+25,DEPTH_WIDTH*scaleParam, DEPTH_HEIGHT*scaleParam); //draw the focus texture
-		ofPopMatrix();
-	} else 
-	*/
-	//draw a layer with clear focus everywhere
-	texFocus.draw(0,0+25,DEPTH_WIDTH*scaleParam, DEPTH_HEIGHT*scaleParam); //draw the focus texture	
-	
-	blur.setBlurParams(4,(float)blurParam/100);
-	blur.beginRender();
-	texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
-	blur.endRender();
-	blur.draw(0, 0+25, DEPTH_WIDTH*scaleParam, DEPTH_HEIGHT*scaleParam, true);
-	ofDisableAlphaBlending();
-	
-	//texGray.draw(640,0,DEPTH_WIDTH,DEPTH_HEIGHT);
-
-	ofSetColor(bgColor.r,bgColor.g,bgColor.b);
-	ofRect(640,0+25,VIDEO_WIDTH,ofGetHeight());
-	ofSetColor(0xffffff);
-
-	
-	////////////////////////////////////////////////////////// RGB video and Skeleton Tracking Visualization
-	
-	//video image
-	//texColorAlpha.draw(640+20,0+25,VIDEO_WIDTH, VIDEO_HEIGHT);
-
-	//circle drawn on head of tracked individual
-	ofCircle(headPositionX+640,headPositionY,10);
-	ofCircle(g_kinectGrabber.shoulderLeft_x+640, g_kinectGrabber.shoulderLeft_y,10);
-	ofCircle(g_kinectGrabber.shoulderRight_x+640,g_kinectGrabber.shoulderRight_y,10); 
-	ofCircle(g_kinectGrabber.handLeft_x+640,g_kinectGrabber.handLeft_y,10); 
-	ofCircle(g_kinectGrabber.handRight_x+640,g_kinectGrabber.handRight_y,10);
-	ofLine(headPositionX+640,headPositionY,g_kinectGrabber.shoulderLeft_x+640, g_kinectGrabber.shoulderLeft_y);
-	ofLine(g_kinectGrabber.shoulderLeft_x+640, g_kinectGrabber.shoulderLeft_y,g_kinectGrabber.handLeft_x+640,g_kinectGrabber.handLeft_y);
-	ofLine(headPositionX+640,headPositionY,g_kinectGrabber.shoulderRight_x+640,g_kinectGrabber.shoulderRight_y);
-	ofLine(g_kinectGrabber.shoulderRight_x+640,g_kinectGrabber.shoulderRight_y,g_kinectGrabber.handRight_x+640,g_kinectGrabber.handRight_y);
-
-	// for debugging, draws the current mouse position
-	//ofSetColor(0x00000);
-	//ofDrawBitmapString(eventString, 650, 500);
-	//ofSetColor(0xffffff);
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// gui interface
 	ofEnableAlphaBlending();
 	header.draw(0,0);
-	sharedMediaSpace.draw(643,0+25);
-	roster.draw(643,529);
-
-	//ofEnableAlphaBlending();
+	//sharedMediaSpace.draw(643,0+25);
+	roster.draw(643,700);
+	
 	for(int i=0;i<3;i++) buttons[i]->drawFont(buttonPressed[i]);   //draw 3 buttons always existing at the bottom
 	buttons[6]->drawFont(buttonPressed[6]); //draw 7th button always existing
 	buttons[7]->drawFont(buttonPressed[7]);
@@ -346,7 +294,7 @@ void testApp::draw(){
 			buttons[i]->trigger=true;
 			buttons[i]->drawFont(buttonPressed[i]);
 		}
-		//for(int i=0;i<nSliders;i++) sliders[i]->drawSlider(80,400);
+		for(int i=0;i<nSliders;i++) sliders[i]->drawSlider(80,400);
 		sliders[0]->drawSlider(110,400);
 		sliders[1]->drawSlider(4,0.01);
 		sliders[2]->drawSlider(1,0.1);
@@ -354,9 +302,6 @@ void testApp::draw(){
 		for(int i=3;i<6;i++) buttons[i]->trigger=false;
 	}
 	ofDisableAlphaBlending();
-
-	//talk bubble
-	for(int i=0;i<nBubbles;i++) talkBubbles[i]->draw();
 
 	//sketch viewer
 	ofEnableAlphaBlending();
@@ -384,8 +329,14 @@ void testApp::draw(){
 	talkBubbles[0]->drawElapsedTime(769,638);
 	talkBubbles[0]->drawDate(769,609);
 
-	texGray.draw(640,0+25,DEPTH_WIDTH,DEPTH_HEIGHT);
-	
+	*/
+    // ----------------GUI interface: LIVE MODE---------------------------//
+
+	// ----------------GUI interface: REVIEW MODE---------------------------//
+	// ----------------GUI interface: REVIEW MODE---------------------------//
+
+	//talk bubble
+	for(int i=0;i<nBubbles;i++) talkBubbles[i]->draw();
 	
 		g_kinectGrabber.unlock();
 		g_kinectGrabber.setWriteTurn(true);
