@@ -254,13 +254,13 @@ void testApp::draw(){
 	ofEnableAlphaBlending();
 
 	//draw a layer entirely clear
-	texFocus.draw(0+533,0+25,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //draw the focus texture	  //520*390
+	texFocus.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //draw the focus texture	  //520*390
 	//draw another blured layer on top, with alpha(skeleton)=0;
 	blur.setBlurParams(4,(float)blurParam/100);
 	blur.beginRender();
 	texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
 	blur.endRender();
-	blur.draw(0+533, 0+25, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
+	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 	ofDisableAlphaBlending();
 
 
@@ -281,7 +281,7 @@ void testApp::draw(){
 	}
 
 	ofEnableAlphaBlending();
-	header.draw(0,0);
+	
 	//sharedMediaSpace.draw(643,0+25);
 	roster.draw(643,700);
 	
@@ -335,11 +335,16 @@ void testApp::draw(){
 	// ----------------GUI interface: REVIEW MODE---------------------------//
 	// ----------------GUI interface: REVIEW MODE---------------------------//
 
+	ofEnableAlphaBlending();
 	//talk bubble
 	for(int i=0;i<nBubbles;i++) talkBubbles[i]->draw();
+	//draw gui
+	header.draw(0,0);
+	ofDisableAlphaBlending();
 	
-		g_kinectGrabber.unlock();
-		g_kinectGrabber.setWriteTurn(true);
+	//unlock KinectGrabber
+	g_kinectGrabber.unlock();
+	g_kinectGrabber.setWriteTurn(true);
 	
 }
 //-------------------------------------------------------------
