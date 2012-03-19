@@ -33,19 +33,22 @@ void testApp::setup(){
 	maskValue=3;
 	  
 	//gui interface
-	nButtons=9;
+	nButtons=11;
 	buttons=new button*[nButtons];
-	buttons[0]=new button("setup",55,752,37,30,true,"images/set_a.png","images/set_b.png");
-	buttons[1]=new button("active",234,759,100,30,true,"images/auto_a.png","images/auto_b.png");
-	buttons[2]=new button("manual",326,759,100,30,true,"images/manual_a.png","images/manual_b.png");
+	buttons[0]=new button("setup",453,839,37,30,true,"images/set_a.png","images/set_b.png");
+	buttons[1]=new button("active",694,836,100,30,true,"images/auto_a.png","images/auto_b.png");
+	buttons[2]=new button("manual",786,836,100,30,true,"images/manual_a.png","images/manual_b.png");
 	
-	buttons[3]=new button("focus",29,529,100,30,false,"images/focus_a.png","images/focus_b.png");
-	buttons[4]=new button("black",29,599,100,30,false,"images/mask_a.png","images/mask_b.png");
-	buttons[5]=new button("zoom", 29,667,100,30,false,"images/zoom_a.png","images/zoom_b.png");
+	buttons[3]=new button("focus",409,606,100,30,false,"images/focus_a.png","images/focus_b.png");
+	buttons[4]=new button("black",409,676,100,30,false,"images/mask_a.png","images/mask_b.png");
+	buttons[5]=new button("zoom", 409,744,100,30,false,"images/zoom_a.png","images/zoom_b.png");
 	
-	buttons[6]=new button("sketchViewer", 524,752,37,30,true,"images/sketch_a.png","images/sketch_b.png");
-	buttons[7]=new button("bubble", 110,752,37,30,true,"images/bubble_a.png","images/bubble_b.png");
-	buttons[8]=new button("ipad", 570,752,37,30,true,"images/ipad_a.png","images/ipad_b.png");
+	buttons[6]=new button("sketchViewer", 1285,695,100,100,true,"images/sketch_a.png","images/sketch_b.png");
+	buttons[7]=new button("bubble", 490,839,37,30,true,"images/bubble_a.png","images/bubble_b.png");
+	buttons[8]=new button("ipad", 1413,695,100,100,true,"images/ipad_a.png","images/ipad_b.png");
+
+	buttons[9]=new button("live",643,21,150,50,true,"images/live_a.png","images/live_b.png");
+	buttons[10]=new button("review",800,21,150,50,true,"images/review_a.png","images/review_b.png");
 
 	webRenderButton=new button*[1];
 	webRenderButton[0]=new button("drawapp",1000,752,37,30,false,"images/ipad_a.png","images/ipad_b.png");
@@ -55,20 +58,17 @@ void testApp::setup(){
 	buttonPressed[1]=true;
 	buttonPressed[0]=true;
 	buttonPressed[3]=true;
-	//buttonPressed[6]=true;
+	buttonPressed[9]=true;
 
 	nSliders=3;
 	sliders=new slider*[nSliders];
-	sliders[0]=new slider(137,540,442);
-	sliders[1]=new slider(137,609,442);	
-	sliders[2]=new slider(137,678,442);
+	sliders[0]=new slider(517,617,649);
+	sliders[1]=new slider(517,687,649);	
+	sliders[2]=new slider(517,755,649);
+
 
 	header.loadImage("images/head.png");
-	header2.loadImage("images/raw.png");
-	bg.loadImage("images/bg.png");
-	sharedMediaSpace.loadImage("images/sharedMedia.png");
-	roster.loadImage("images/roster.png");
-
+	shadow.loadImage("images/shadow.png");
 	
 	//talk bubbles
 	nBubbles = 6; 
@@ -159,7 +159,7 @@ void testApp::update(){
 		//talk bubbles update
 		int headPositionX = g_kinectGrabber.rightShoulderXValues[i]+25;
 		int headPositionY = g_kinectGrabber.headYValues[i]-30;
-		talkBubbles[i]->updatePosition(headPositionX*scaleParam*SCALE+RENDER_WIDTH,headPositionY*scaleParam*SCALE);
+		talkBubbles[i]->updatePosition(headPositionX*scaleParam*SCALE+RENDER_WIDTH,headPositionY*scaleParam*SCALE+105);
 		talkBubbles[i]->updateTimer();
 
 		//manual selection match tracked head; activating talkBubble in manual mode
@@ -194,7 +194,7 @@ void testApp::update(){
 
 	
 	if(buttonPressed[1]) focusRGB(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],maskValue, closestID, personSpeaking);	
-	else if(buttonPressed[2] && !confirmSelection) focusRGB_manual(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],mouseX,mouseY);	
+	else if(buttonPressed[2] && !confirmSelection) focusRGB_manual(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],mouseX*scaleParam*SCALE+RENDER_WIDTH,mouseY*scaleParam*SCALE+105);	
 	else if(buttonPressed[2] && confirmSelection)  focusRGB_manualLocked(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],lockedPersonID);	
 	
 
@@ -245,27 +245,22 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 	ofEnableSmoothing();
+	ofEnableAlphaBlending();
 
 	int blurParam=120; //different mode has different blurParameter control
 	scaleParam=1;
 
-
-	//diminished image
-	ofEnableAlphaBlending();
-
 	//draw a layer entirely clear
 	texFocus.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //draw the focus texture	  //520*390
+
 	//draw another blured layer on top, with alpha(skeleton)=0;
 	blur.setBlurParams(4,(float)blurParam/100);
 	blur.beginRender();
 	texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
 	blur.endRender();
 	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
-	ofDisableAlphaBlending();
 
-
-	// ----------------GUI interface: LIVE MODE---------------------------//
-	/*
+	
 	if(buttonPressed[3]) {
 		if(sliders[0]->value!=NULL) blurParam=sliders[0]->value;
 		scaleParam=1;
@@ -281,30 +276,40 @@ void testApp::draw(){
 	}
 
 	ofEnableAlphaBlending();
-	
-	//sharedMediaSpace.draw(643,0+25);
-	roster.draw(643,700);
-	
-	for(int i=0;i<3;i++) buttons[i]->drawFont(buttonPressed[i]);   //draw 3 buttons always existing at the bottom
-	buttons[6]->drawFont(buttonPressed[6]); //draw 7th button always existing
-	buttons[7]->drawFont(buttonPressed[7]);
-	buttons[8]->drawFont(buttonPressed[8]);
-	if(buttonPressed[0]){  //draw 3 buttons triggered by pressing the setUp button; boolean trigger is used to disable the button pressing if it's not shown on the screen
-		for(int i=3;i<6;i++){
+	header.draw(0,0);
+	shadow.draw(0,513);
+	buttons[9]->drawFont(buttonPressed[9]);
+	buttons[10]->drawFont(buttonPressed[10]);
+
+	if(buttonPressed[9]){ //live mode
+
+		for(int i=0;i<3;i++) {
+			buttons[i]->drawFont(buttonPressed[i]);   //draw 3 buttons always existing at the bottom
 			buttons[i]->trigger=true;
-			buttons[i]->drawFont(buttonPressed[i]);
 		}
-		for(int i=0;i<nSliders;i++) sliders[i]->drawSlider(80,400);
-		sliders[0]->drawSlider(110,400);
-		sliders[1]->drawSlider(4,0.01);
-		sliders[2]->drawSlider(1,0.1);
-	} else if(!buttonPressed[0]){
-		for(int i=3;i<6;i++) buttons[i]->trigger=false;
+		for(int i=6;i<9;i++){
+			buttons[i]->drawFont(buttonPressed[i]);   
+			buttons[i]->trigger=true;
+
+		}
+		if(buttonPressed[0]){  //draw 3 buttons triggered by pressing the setUp button; boolean trigger is used to disable the button pressing if it's not shown on the screen
+			for(int i=3;i<6;i++){
+				buttons[i]->trigger=true;
+				buttons[i]->drawFont(buttonPressed[i]);
+			}
+			for(int i=0;i<nSliders;i++) sliders[i]->drawSlider(80,400);
+			sliders[0]->drawSlider(110,400);
+			sliders[1]->drawSlider(4,0.01);
+			sliders[2]->drawSlider(1,0.1);
+		} else if(!buttonPressed[0]){
+			for(int i=3;i<6;i++) buttons[i]->trigger=false;
+		}
 	}
-	ofDisableAlphaBlending();
+	else if (buttonPressed[10]){ //review mode
+		for(int i=0;i<9;i++) buttons[i]->trigger=false; //disable all the buttons used in live mode
+	}
 
 	//sketch viewer
-	ofEnableAlphaBlending();
 	if(!sketchShareView.close){
 		sketchShareView.scale=ofMap(sliders[2]->value,1,0.1,1,4);
 		sketchShareView.drawBg();
@@ -319,27 +324,9 @@ void testApp::draw(){
 		webRender.drawWebcore(ofMap(sliders[2]->value,1,0.1,1,4));
 	}
 
-	// draw roster
-	talkBubbles[0]->drawName(746,699);
-	talkBubbles[1]->drawName(1030,699);
-	talkBubbles[2]->drawName(746,727);
-	talkBubbles[3]->drawName(1030,726);
-	talkBubbles[4]->drawName(746,756);
-	talkBubbles[5]->drawName(1030,755);
-	talkBubbles[0]->drawElapsedTime(769,638);
-	talkBubbles[0]->drawDate(769,609);
-
-	*/
-    // ----------------GUI interface: LIVE MODE---------------------------//
-
-	// ----------------GUI interface: REVIEW MODE---------------------------//
-	// ----------------GUI interface: REVIEW MODE---------------------------//
-
-	ofEnableAlphaBlending();
 	//talk bubble
 	for(int i=0;i<nBubbles;i++) talkBubbles[i]->draw();
-	//draw gui
-	header.draw(0,0);
+	
 	ofDisableAlphaBlending();
 	
 	//unlock KinectGrabber
@@ -400,6 +387,16 @@ void testApp::mousePressed(int x, int y, int button){
 	if(buttons[7]->buttonPressed(x,y)) buttonPressed[7]=!buttonPressed[7]; //turn on/off the talkBubble
 	if(buttons[8]->buttonPressed(x,y)) buttonPressed[8]=!buttonPressed[8]; //turn on/off the iPad
 	
+	if(buttons[9]->buttonPressed(x,y)) {
+		buttonPressed[9]=true; //turn on/off the live mode
+		buttonPressed[10]=false;
+	}
+	if(buttons[10]->buttonPressed(x,y)) {
+		buttonPressed[10]=true; //turn on/off the review mode
+		buttonPressed[9]=false;
+	}
+
+	
 	if(buttons[1]->buttonPressed(x,y)){
 		buttonPressed[1]=true;
 		buttonPressed[2]=false;
@@ -424,10 +421,7 @@ void testApp::mousePressed(int x, int y, int button){
 		buttonPressed[4]=false;
 		printf("buttonPressed \n");
 	}
-	//if(buttons[6]->buttonPressed(x,y)) buttonPressed[6]=!buttonPressed[6];  //turn on and off the sketchviewer
 
-	//sketchViewer
-	//sketchShareView.closeDetect(x,y);
 	if(buttonPressed[6]) sketchShareView.zoomDetect(x,y);
 	
 	if(buttonPressed[8]){

@@ -22,19 +22,11 @@ button::button(string _buttonName, int _originX, int _originY, int _bWidth, int 
 }
 
 void button::drawFont(bool _buttonPressed){
-	//ofPushMatrix();
 	if (_buttonPressed){
-		//ofSetColor(0xFF9933);
 		img_b.draw(originX,originY);
 	} else {
-		//ofSetColor(0xCCCCCC);
 		img_a.draw(originX,originY);
 	}
-	//font.drawString(buttonName, originX,originY-10);
-	
-	//ofNoFill();
-	//ofRect(originX, originY-bHeight,bWidth,bHeight);
-	//ofPopMatrix();
 }
 
 bool button::buttonPressed(int x, int y){

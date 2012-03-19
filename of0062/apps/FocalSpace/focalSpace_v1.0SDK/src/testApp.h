@@ -79,10 +79,10 @@ class testApp : public ofBaseApp{
 		int             nSliders;
 		float           scaleParam; //for Zoom slider
 		ofImage         header;
-		ofImage         header2;
-		ofImage         bg;
-		ofImage         sharedMediaSpace;
-		ofImage         roster;
+		//ofImage         bg;
+		//ofImage         sharedMediaSpace;
+		//ofImage         roster;
+		ofImage         shadow;
 		
 		//talk bubbles
 		talkBubble** talkBubbles;  
