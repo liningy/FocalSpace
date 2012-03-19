@@ -58,9 +58,6 @@
     <ClCompile Include="src\webRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="backupFunctions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\addons\ofxThread\src\ofxThread.h">
