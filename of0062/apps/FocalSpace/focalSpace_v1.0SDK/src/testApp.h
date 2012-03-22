@@ -19,9 +19,10 @@
 #include "webRender.h"
 #include "gesture.h"
 
-const int                     RENDER_WIDTH = 540;
-const int                     RENDER_HEIGHT= 405;
-const float                   SCALE=0.844;
+//const int                     RENDER_WIDTH = 540;
+//const int                     X_SHIFTS=540;
+//const int                     RENDER_HEIGHT= 405;
+//const float                   SCALE=0.844;
 
 //const int DEPTH_THRESHOLD = 350;
 class testApp : public ofBaseApp{
@@ -66,22 +67,17 @@ class testApp : public ofBaseApp{
 		//GUI
 		ofColor         bgColor;
 		int             thresh;
-		bool            activeFocus; //to deside the active or inActive focus
+		bool            activeFocus;  //to deside the active or inActive focus
 
 		
 		//gui buttons
 		button**        buttons;
 		int             nButtons;
 		bool            buttonPressed[9]; //the number of the boolean should equal to nButtons
-		button**        webRenderButton;
-		bool            webRButtonPressed;
 		slider**        sliders;
 		int             nSliders;
 		float           scaleParam; //for Zoom slider
 		ofImage         header;
-		//ofImage         bg;
-		//ofImage         sharedMediaSpace;
-		//ofImage         roster;
 		ofImage         shadow;
 		
 		//talk bubbles
@@ -110,6 +106,10 @@ class testApp : public ofBaseApp{
 		ofxUDPManager udpConnection;
 		ofTrueTypeFont  mono;
 		string              message;
+
+		//others
+		int              translateMouseX;
+		int              translateMouseY;
 };
 
 #endif

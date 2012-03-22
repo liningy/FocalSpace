@@ -4,11 +4,10 @@
 #define RECONNECT_TIME 400
 //--------------------------------------------------------------
 void testApp::setup(){	
-	//ofEnableAlphaBlending();
-	bgColor.r=0;//20;
-	bgColor.g=0;//20;
-	bgColor.b=0;//24;
-	ofBackground(bgColor.r,bgColor.g,bgColor.b);	            // Set the background color (right now, white)
+	bgColor.r=0;
+	bgColor.g=0;
+	bgColor.b=0;
+	ofBackground(bgColor.r,bgColor.g,bgColor.b);
 	
 	blur.setup(DEPTH_WIDTH, DEPTH_HEIGHT);  // set up the blur shader
 	thresh=300;
@@ -18,7 +17,7 @@ void testApp::setup(){
 	g_kinectGrabber.Kinect_Init();
 	conference_init();
 	
-	colorAlphaPixels =  g_kinectGrabber.Kinect_getRGBBuffer();//new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	colorAlphaPixels =  g_kinectGrabber.Kinect_getRGBBuffer(); //new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	// allocate memory for focus and blur pixels
 	focusPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	blurPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
@@ -27,7 +26,7 @@ void testApp::setup(){
 	texColorAlpha.allocate(VIDEO_WIDTH,VIDEO_HEIGHT,GL_RGBA);
 	texFocus.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
 	texBlur.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
-	texGray.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); // gray depth texture
+	//texGray.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); // gray depth texture
 
 	//other parameters
 	maskValue=3;
@@ -39,33 +38,28 @@ void testApp::setup(){
 	buttons[1]=new button("active",694,836,100,30,true,"images/auto_a.png","images/auto_b.png");
 	buttons[2]=new button("manual",786,836,100,30,true,"images/manual_a.png","images/manual_b.png");
 	
-	buttons[3]=new button("focus",409,606,100,30,false,"images/focus_a.png","images/focus_b.png");
-	buttons[4]=new button("black",409,676,100,30,false,"images/mask_a.png","images/mask_b.png");
+	buttons[3]=new button("blur",409,606,100,30,false,"images/focus_a.png","images/focus_b.png");
+	buttons[4]=new button("tint",409,676,100,30,false,"images/mask_a.png","images/mask_b.png");
 	buttons[5]=new button("zoom", 409,744,100,30,false,"images/zoom_a.png","images/zoom_b.png");
 	
-	buttons[6]=new button("sketchViewer", 1285,695,100,100,true,"images/sketch_a.png","images/sketch_b.png");
-	buttons[7]=new button("bubble", 490,839,37,30,true,"images/bubble_a.png","images/bubble_b.png");
+	buttons[6]=new button("flipchart", 1285,695,100,100,true,"images/sketch_a.png","images/sketch_b.png");
+	buttons[7]=new button("namebubble", 490,839,37,30,true,"images/bubble_a.png","images/bubble_b.png");
 	buttons[8]=new button("ipad", 1413,695,100,100,true,"images/ipad_a.png","images/ipad_b.png");
 
 	buttons[9]=new button("live",643,21,150,50,true,"images/live_a.png","images/live_b.png");
 	buttons[10]=new button("review",800,21,150,50,true,"images/review_a.png","images/review_b.png");
 
-	webRenderButton=new button*[1];
-	webRenderButton[0]=new button("drawapp",1000,752,37,30,false,"images/ipad_a.png","images/ipad_b.png");
-	webRButtonPressed=true;
-
 	for(int i=0;i<nButtons;i++) buttonPressed[i]=false;
-	buttonPressed[1]=true;
 	buttonPressed[0]=true;
+	buttonPressed[1]=true;
 	buttonPressed[3]=true;
 	buttonPressed[9]=true;
 
 	nSliders=3;
 	sliders=new slider*[nSliders];
-	sliders[0]=new slider(517,617,649);
-	sliders[1]=new slider(517,687,649);	
-	sliders[2]=new slider(517,755,649);
-
+	sliders[0]=new slider(517,617,645);
+	sliders[1]=new slider(517,687,645);	
+	sliders[2]=new slider(517,755,645);
 
 	header.loadImage("images/head.png");
 	shadow.loadImage("images/shadow.png");
@@ -90,15 +84,15 @@ void testApp::setup(){
 	//other parameters
 	confirmSelection=false;
 	lockedPersonID=0;
-
-	//gesture
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 	ofBackground(bgColor.r,bgColor.g,bgColor.b);
 	g_kinectGrabber.Kinect_Update();
-	//conference_update();
+
+	translateMouseX=(mouseX-RENDER_WIDTH)/SCALE;
+	translateMouseY=(mouseY-105)/SCALE;
     
 	// There is a race on m_rgbBuffer. To ensure that the color data is only updated to the front end when the data has been fully copied, we must use a critical section.
 	// This alone does not guarantee that the read and write threads execute interchangably. To ensure starvation freedom, we introduce a "writeTurn" variable. 
@@ -111,29 +105,21 @@ void testApp::update(){
 			if(colorAlphaPixels != NULL) {
 				texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA);
 			}
-			//g_kinectGrabber.unlock();
+			g_kinectGrabber.unlock();
 		}
-		//g_kinectGrabber.setWriteTurn(true);
+		g_kinectGrabber.setWriteTurn(true);
 	}
 
 	
-	grayPixels = (BYTE*)g_kinectGrabber.Kinect_getDepthPixels();	
-	if (grayPixels != NULL) {
-		texGray.loadData(grayPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
-	}
+	//grayPixels = (BYTE*)g_kinectGrabber.Kinect_getDepthPixels();	
+	//if (grayPixels != NULL) texGray.loadData(grayPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
+
 	
 	USHORT* depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
 
-    // Gets the joint positions
-	g_kinectGrabber.getJointsPoints();
-	headPositionX=g_kinectGrabber.headJoints_x;
-	headPositionY=g_kinectGrabber.headJoints_y;
-	headPositionZ=g_kinectGrabber.headJoints_z;
-
-	
 	// TODO: move this somewhere else. Probably goes in the conference.cpp file?
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
-	double minSoundDiscrepancy = 50;
+	double minSoundDiscrepancy = 60;
 	bool personSpeaking = false;
 	//printf("-------------------------------------------\n"); 
 	//printf(" Head Positions \n"); 
@@ -157,21 +143,23 @@ void testApp::update(){
 		} 
 
 		//talk bubbles update
-		int headPositionX = g_kinectGrabber.rightShoulderXValues[i]+25;
-		int headPositionY = g_kinectGrabber.headYValues[i]-30;
-		talkBubbles[i]->updatePosition(headPositionX*scaleParam*SCALE+RENDER_WIDTH,headPositionY*scaleParam*SCALE+105);
+		int headPositionX = g_kinectGrabber.rightShoulderXValues[i]*scaleParam*SCALE+X_SHIFTS+25;
+		int headPositionY = g_kinectGrabber.headYValues[i]*scaleParam*SCALE+105-30;
+		talkBubbles[i]->updatePosition(headPositionX,headPositionY);
 		talkBubbles[i]->updateTimer();
 
-		//manual selection match tracked head; activating talkBubble in manual mode
-		int closestPersonDepth=g_kinectGrabber.headZValues[i];
-		int mouseDepth=depthBuff[mouseY*DEPTH_WIDTH+mouseX];
-		if (ABS(mouseDepth-closestPersonDepth)< DEPTH_THRESHOLD) {
-			peopleSelectedbyMouse[i]=true;
-			lockedPersonID=i;
-		} else if (confirmSelection){
-			peopleSelectedbyMouse[i]=true;
-		} else {
-			peopleSelectedbyMouse[i]=false;
+		//manual selection match tracked head; activating talkBubble in manual mode; only when mouse within the camera view
+		if((translateMouseX>0)&&(translateMouseX<DEPTH_WIDTH)&&(translateMouseY>0)&&(translateMouseY<DEPTH_HEIGHT)){
+			int closestPersonDepth=g_kinectGrabber.headZValues[i];
+			int mouseDepth=depthBuff[(int)(translateMouseY*DEPTH_WIDTH+translateMouseX)];
+			if (ABS(mouseDepth-closestPersonDepth)< DEPTH_THRESHOLD) {
+				peopleSelectedbyMouse[i]=true;
+				lockedPersonID=i;
+			} else if (confirmSelection){
+				peopleSelectedbyMouse[i]=true;
+			} else {
+				peopleSelectedbyMouse[i]=false;
+			}
 		}
 		
 		if(buttonPressed[2]){
@@ -194,10 +182,9 @@ void testApp::update(){
 
 	
 	if(buttonPressed[1]) focusRGB(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],maskValue, closestID, personSpeaking);	
-	else if(buttonPressed[2] && !confirmSelection) focusRGB_manual(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],mouseX*scaleParam*SCALE+RENDER_WIDTH,mouseY*scaleParam*SCALE+105);	
+	else if(buttonPressed[2] && !confirmSelection) focusRGB_manual(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],translateMouseX,translateMouseY);	
 	else if(buttonPressed[2] && confirmSelection)  focusRGB_manualLocked(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],lockedPersonID);	
 	
-
 	texFocus.loadData(focusPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
 	texBlur.loadData(blurPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
 
@@ -352,10 +339,10 @@ void testApp::keyPressed(int key){
         }
     }
 
-    if(webRButtonPressed){
-        if(key == '-') webRenderButton[0]->typeContents.erase();  //erase name input for the active bubble
-        else webRenderButton[0]->typeContents.append(1,(char)key); //type in name for the active bubble
-    }
+    //if(webRButtonPressed){
+    //    if(key == '-') webRenderButton[0]->typeContents.erase();  //erase name input for the active bubble
+    //    else webRenderButton[0]->typeContents.append(1,(char)key); //type in name for the active bubble
+    //}
 
 }
 

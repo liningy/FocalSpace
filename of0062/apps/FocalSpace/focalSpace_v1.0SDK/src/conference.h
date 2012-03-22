@@ -8,7 +8,11 @@
 #include "ofMain.h"
 
 // number of millimeters threshold between a skeleton's depth reading and visible image
-const int DEPTH_THRESHOLD = 350;
+const int                     DEPTH_THRESHOLD = 350;
+const int                     RENDER_WIDTH = 540;
+const int                     X_SHIFTS=540;
+const int                     RENDER_HEIGHT= 405;
+const float                   SCALE=0.844;
 
 //bool peopleSelectedbyMouse;
 
