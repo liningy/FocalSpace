@@ -13,6 +13,8 @@ const int                     RENDER_WIDTH = 540;
 const int                     X_SHIFTS=540;
 const int                     RENDER_HEIGHT= 405;
 const float                   SCALE=0.844;
+const int                     MOBILE_WIDTH= 360;
+const int                     MOBILE_HEIGHT=480;
 
 //bool peopleSelectedbyMouse;
 
