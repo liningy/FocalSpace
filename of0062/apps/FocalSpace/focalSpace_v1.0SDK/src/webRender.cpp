@@ -6,23 +6,16 @@ void WebRender::setupWebcore(){
     webView = awe_webcore_create_webview(WEB_WIDTH, WEB_HEIGHT, false);
 	//awe_webview* webView = awe_webcore_create_webview(WIDTH, HEIGHT, false);
     awe_string* url_str = awe_string_create_from_ascii(URL, strlen(URL));
-
     awe_webview_load_url(webView, url_str, awe_string_empty(), awe_string_empty(), awe_string_empty());
-
     // Wait for or WebView to finish loading
     while(awe_webview_is_loading_page(webView))
     {
         awe_webcore_update();
     }
-
 	renderBuffer = awe_webview_render(webView);
-
-	
-
 	pixelBuffer = new unsigned char [WEB_WIDTH*WEB_HEIGHT*4];
 	rightPixelBuffer = new unsigned char [WEB_WIDTH*WEB_HEIGHT*3];
 	texColor.allocate(WEB_WIDTH,WEB_HEIGHT,GL_RGB);
-
 	//for render the GUI
 	webWidth_l 		= 605;//602; // try to grab at this size. 
 	webHeight_l 	= 430;//451;

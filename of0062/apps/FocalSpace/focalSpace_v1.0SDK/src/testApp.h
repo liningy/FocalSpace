@@ -76,6 +76,15 @@ class testApp : public ofBaseApp{
 		shaderBlur      blur;
 		float           maskValue;
 		
+		//basic function
+		void            setup_bg();
+		void            setup_allocatePixels();
+		void            setup_gui();
+		void            setup_mobile();
+		void            update_mobile();
+		void            update_gui();
+
+
 		//GUI
 		ofColor         bgColor;
 		int             thresh;

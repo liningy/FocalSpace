@@ -33,7 +33,7 @@ void tags::checkRightHandUp(int rightHandPY, int headPositionY){
 	}
 	if ((rightHandPY < headPositionY)){
 		rightHandUpCount ++;
-		if (rightHandUpCount == 20){
+		if (rightHandUpCount == 5){ //20
 			bRightHandUp = true;
 			return;
 		}

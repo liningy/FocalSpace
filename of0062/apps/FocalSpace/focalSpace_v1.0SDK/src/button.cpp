@@ -29,22 +29,12 @@ void button::drawFont(bool _buttonPressed){
 }
 
 void button::drawFontwithAltPic(bool _buttonPressed, bool alternatePic){
-	//ofPushMatrix();
 	ofEnableAlphaBlending();
 	if (_buttonPressed && !alternatePic){
-		//ofSetColor(0xFF9933);
 		img_b.draw(originX,originY);
-	} else {//from openframeworks example
-		//ofSetColor(0,0,0,76);    // black, 30% transparent
-		//ofSetColor(0xCCCCCC);
+	} else {
 		img_a.draw(originX,originY);
 	}
-	//font.drawString(buttonName, originX,originY-10);
-	
-	//ofNoFill();
-	////ofRect(originX, originY-bHeight,bWidth,bHeight);
-	//ofRect(originX,originY,bWidth,bHeight);
-	//ofPopMatrix();
 	ofDisableAlphaBlending();
 }
 

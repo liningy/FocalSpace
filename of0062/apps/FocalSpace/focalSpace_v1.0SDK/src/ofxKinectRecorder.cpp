@@ -45,7 +45,8 @@ void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, 
 	fwrite(&lefthandx,sizeof(int),1,f);
 	fwrite(&lefthandy,sizeof(int),1,f);
 	fwrite(&righthandx,sizeof(int),1,f);
-	fwrite(&righthandy,sizeof(int),1,f);
+	fwrite(&righthandy,sizeof(unsigned int),1,f);
+
 }
 /* endOfRecording is true when the video has ended (and we're out of gestures. future - it should also be true when switching b/n gestures)
 */
