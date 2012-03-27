@@ -26,7 +26,7 @@ void ofxKinectRecorder::init(const string & filename, const string & filenameInt
 	//nFramesRecorded = false;
 }
 
-void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, time_t rawtime, int headx, int heady, int headz, int leftshoulderx, int leftshouldery, int rightshoulderx, int rightshouldery, int lefthandx, int lefthandy, int righthandx, int righthandy) {
+void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, time_t rawtime, int headx, int heady, int headz, int leftshoulderx, int leftshouldery, int rightshoulderx, int rightshouldery, int lefthandx, int lefthandy, int righthandx, int righthandy, USHORT* depthbuff) {
 	if(!f ||!raw_depth) return;
 	
 	if(rgb != NULL) {
@@ -45,7 +45,8 @@ void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, 
 	fwrite(&lefthandx,sizeof(int),1,f);
 	fwrite(&lefthandy,sizeof(int),1,f);
 	fwrite(&righthandx,sizeof(int),1,f);
-	fwrite(&righthandy,sizeof(unsigned int),1,f);
+	fwrite(&righthandy,sizeof(int),1,f);
+	fwrite(depthbuff,640*480*2,1,f);
 
 }
 /* endOfRecording is true when the video has ended (and we're out of gestures. future - it should also be true when switching b/n gestures)

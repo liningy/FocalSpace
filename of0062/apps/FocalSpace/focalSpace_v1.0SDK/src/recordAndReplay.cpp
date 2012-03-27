@@ -93,10 +93,10 @@ void recordAndReplay::readFrame(){
 	}
 }
 void recordAndReplay::storeFrame(unsigned char* colorAlphaPixels, unsigned char * grayPixels, time_t rawTime, int headPositionX, int headPositionY, int headPositionZ,
-						int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY){
+						int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY, USHORT* depthBuff){
 	nFrames++;
 	kinectRecorder.newFrame(colorAlphaPixels, grayPixels, rawTime, headPositionX, headPositionY, headPositionZ, leftShoulderX, leftShoulderY, rightShoulderX,
-							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY);
+							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, depthBuff);
 	numRecordedFrames ++;
 	myTags.checkRightHandUp(rightHandPY,headPositionY); //(every call to this increments a pointer - if right hand is raised. So do it only once per frame)
 	if (myTags.getBRightHandUp()){//if there are more kinds of gestures and audio, send all of them together at end (otherwise, order will get mixed up I believe),but not with suggested improvement

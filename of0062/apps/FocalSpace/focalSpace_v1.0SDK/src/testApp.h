@@ -69,6 +69,8 @@ class testApp : public ofBaseApp{
 		unsigned char	* mobilePixels;
 		unsigned char	* mobileBlurPixels;
 
+		USHORT* depthBuff; // depthBuff stores unsigned short (2 bytes) pointers pointing to each pixels's depth in milimeter; in total it has 1 * width * height
+
 		int headPositionX, headPositionY, headPositionZ;
 		int neckPositionX, neckPositionY, leftShoulderX, leftShoulderY, rightShoulderX, rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY;
 		bool peopleSelectedbyMouse;

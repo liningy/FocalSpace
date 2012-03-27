@@ -20,7 +20,7 @@ public:
 	/// set video to true to enable the video (infrared/RGB) image
 	/// make sure you recorded the video frames or reading them will fail big time!
 	void setup(const string & file, const string & fileInt, bool video=false);
-	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,int>>>>>>>>>>>>> updatea();
+	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> updatea();
 	pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, int>>>>>>>>>> updateInt();
 	void seek(int frameNo);
 	void update();
@@ -79,7 +79,7 @@ private:
 	ofTexture depthTex,videoTex;
 	bool bUseTexture;
 	unsigned char *rgb;
-	
+	USHORT* depthbuff;
 	ofPixels pixels;
 
 	bool bVideo;

@@ -208,6 +208,7 @@ void testApp::update(){
 			leftHandPY =       recAndRep.getLeftHandPY();
 			rightHandPX =      recAndRep.getRightHandPX();
 			rightHandPY =	   recAndRep.getRightHandPY();
+			depthBuff =        recAndRep.getDepthBuff();
 		}
     }else{
 		if(g_kinectGrabber.getWriteTurn() == false) {
@@ -234,15 +235,15 @@ void testApp::update(){
 		leftHandPY = g_kinectGrabber.handLeft_y;
 		rightHandPX = g_kinectGrabber.handRight_x;
 		rightHandPY = g_kinectGrabber.handRight_y;
+		depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
 	}
 	timeinfo = localtime (&rawTime );
 
 	if(colorAlphaPixels != NULL) texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA); // load the RGBA values into a texture
-	USHORT* depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
 	
 	if(recAndRep.getBRecord()){
 		recAndRep.storeFrame(colorAlphaPixels, grayPixels, rawTime, headPositionX, headPositionY, headPositionZ, leftShoulderX, leftShoulderY, rightShoulderX,
-							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY);
+							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, depthBuff);
 	}
 
 	// TODO: move this somewhere else. Probably goes in the conference.cpp file?

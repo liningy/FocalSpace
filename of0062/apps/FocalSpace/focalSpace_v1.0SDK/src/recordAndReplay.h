@@ -30,7 +30,7 @@ public:
 	/// interface with testApp
 	void readFrame(); //(sets the variables testApp is going to read - is called during playback)
 	void storeFrame(unsigned char* colorAlphaPixels, unsigned char * grayPixels, time_t rawTime, int headPositionX, int headPositionY, int headPositionZ,
-					int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY);
+					int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY, USHORT* depthBuff);
 	void drawButtons();
 	void drawSmallButtons();
 	void drawSliders();
@@ -93,7 +93,8 @@ public:
 	int getLeftHandPX() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.first;};
 	int getLeftHandPY() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.first;};
 	int getRightHandPX() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.first;};
-	int getRightHandPY() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second;};
+	int getRightHandPY() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	USHORT* getDepthBuff() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second;};
 
 	pair<bool,float> getSecondSliderPressed(int x,int y) {return (*secondSlider).sliderPressed(x,y);};
 	pair<bool,float> getTimerSliderPressed(int x,int y) {return (*timer).sliderPressed(x,y);};
@@ -137,7 +138,7 @@ private:
 	bool smallButtonActive;
 
 	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
-		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,int>>>>>>>>>>>>> rgbdepthpair;//variable that accepts the variables that kinectPlayer sends
+		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> rgbdepthpair;//variable that accepts the variables that kinectPlayer sends
 
 	pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int,
 		pair<int, int>>>>>>>>>> frameInfo;//variable that accepts the variables that kinectPlayerInfo sends (nFrames and gesture audio indices)
