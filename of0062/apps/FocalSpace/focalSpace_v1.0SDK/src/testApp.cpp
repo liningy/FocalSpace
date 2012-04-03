@@ -22,8 +22,7 @@ void testApp::setup_allocatePixels(){
 	colorAlphaPixels =  g_kinectGrabber.Kinect_getRGBBuffer(); //new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	focusPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
 	blurPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
-	mobilePixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
-	mobileBlurPixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
+
 	// allocate memory for textures
 	texColorAlpha.allocate(VIDEO_WIDTH,VIDEO_HEIGHT,GL_RGBA);
 	texFocus.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
@@ -78,6 +77,8 @@ void testApp::setup_gui(){
 	webRender.setupWebcore();
 }
 void testApp::setup_mobile(){
+	mobilePixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
+	mobileBlurPixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
 	texMobile.allocate(MOBILE_WIDTH, MOBILE_HEIGHT, GL_RGBA);
 	texMobileBlur.allocate(MOBILE_WIDTH, MOBILE_HEIGHT, GL_RGBA);
 }
@@ -348,12 +349,12 @@ void testApp::draw(){
 	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 
 	//draw the mobile version
-	//texMobile.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT);
-	//blur.setBlurParams(4,(float)200/100);
-	//blur.beginRender(); 
-	//texMobileBlur.draw(0, 0, MOBILE_WIDTH*640/360, MOBILE_HEIGHT);
-	//blur.endRender();
-	//blur.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT, true);
+	texMobile.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT);
+	blur.setBlurParams(4,(float)200/100);
+	blur.beginRender(); 
+	texMobileBlur.draw(0, 0, MOBILE_WIDTH*640/360, MOBILE_HEIGHT);
+	blur.endRender();
+	blur.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT, true);
 
 	header.draw(0,0);
 	shadow.draw(0,513);
