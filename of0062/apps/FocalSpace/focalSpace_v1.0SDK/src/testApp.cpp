@@ -37,7 +37,7 @@ void testApp::update(){
 			recAndRep.readFrame();
 			colorAlphaPixels = recAndRep.getColorAlphaPixels();
 			grayPixels =       recAndRep.getGrayPixels();
-			rawTime = recAndRep.getRawTime();
+			rawTime =		   recAndRep.getRawTime();
 			headPositionX =    recAndRep.getHeadPositionX();
 			headPositionY =    recAndRep.getHeadPositionY();
 			headPositionZ =    recAndRep.getHeadPositionZ();
@@ -56,6 +56,7 @@ void testApp::update(){
 		// load the RGBA values into a texture
 			if(g_kinectGrabber.tryLock()) {
 				colorAlphaPixels = g_kinectGrabber.Kinect_getAlphaPixels();
+				grayPixels = (BYTE*)g_kinectGrabber.Kinect_getDepthPixels();
 				//if(colorAlphaPixels != NULL) {
 				//	texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA);
 				//}
@@ -91,9 +92,9 @@ void testApp::update(){
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
 	double minSoundDiscrepancy = 60;
 	bool personSpeaking = false;
-	//printf("-------------------------------------------\n"); 
-	//printf(" Head Positions \n"); 
-	//printf("-------------------------------------------\n"); 
+	printf("-------------------------------------------\n"); 
+	printf(" Head Positions \n"); 
+	printf("-------------------------------------------\n"); 
 	
 	bool peopleSelectedbyMouse[6];
 	// Loop through all of the 
@@ -233,7 +234,7 @@ void testApp::draw(){
 		recAndRep.drawButtons();
 		recAndRep.drawSliders();
 
-		of currentTime=
+		//Lining of currentTime=
 		if (recAndRep.getBRightHandUp()){//make func for this in recadnrep
 		ofCircle(60,VIDEO_HEIGHT - 20,20);
 		printf("hands up detected");

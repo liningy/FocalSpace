@@ -6,6 +6,8 @@
 //--------------------------------------------------------------------
 recordAndReplay::recordAndReplay(){
 	myTags.init();
+	//kinectPlayer.setup(ofToDataPath("recording.dat"), ofToDataPath("recordingInfo.dat"), true); // set record file and source
+	//kinectRecorder.init(ofToDataPath("recording.dat"), ofToDataPath("recordingInfo.dat"));
 }
 //--------------------------------------------------------------------
 recordAndReplay::~recordAndReplay() {
@@ -13,6 +15,7 @@ recordAndReplay::~recordAndReplay() {
 }
 //void recordAndReplay::init(KinectGrabber g_kinectGrabber){
 void recordAndReplay::init(){	
+
 	VIDEO_WIDTH = 640;
 	VIDEO_HEIGHT= 480;
 	nFrames = 0;

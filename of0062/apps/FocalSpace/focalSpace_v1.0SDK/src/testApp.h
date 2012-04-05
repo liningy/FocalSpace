@@ -53,7 +53,7 @@ class testApp : public ofBaseApp{
 
 	private:
 		KinectGrabber   g_kinectGrabber;
-	
+
 		ofTexture		texColorAlpha;
 		ofTexture		texGray;
 		ofTexture		texFocus;
