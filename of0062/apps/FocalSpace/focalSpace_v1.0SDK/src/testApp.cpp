@@ -2,166 +2,6 @@
 #include <algorithm>
 
 #define RECONNECT_TIME 400
-//--------------------------------------------------------------
-void testApp::setup_bg(){
-	bgColor.r=0;
-	bgColor.g=0;
-	bgColor.b=0;
-	ofBackground(bgColor.r,bgColor.g,bgColor.b);
-	 // set up the blur shader
-	blur.setup(DEPTH_WIDTH, DEPTH_HEIGHT); 
-	thresh=300;
-	//other parameters
-	maskValue=3;
-	rawTime = 0;  
-	confirmSelection=false;
-	lockedPersonID=0;
-}
-void testApp::setup_allocatePixels(){
-	// allocate memory for color,focus and blur pixels
-	colorAlphaPixels =  g_kinectGrabber.Kinect_getRGBBuffer(); //new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
-	focusPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
-	blurPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
-
-	// allocate memory for textures
-	texColorAlpha.allocate(VIDEO_WIDTH,VIDEO_HEIGHT,GL_RGBA);
-	texFocus.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
-	texBlur.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
-}
-void testApp::setup_gui(){
-	//gui interface
-	nButtons=11;
-	buttons=new button*[nButtons];
-	buttons[0]=new button("setup",453,839,37,30,true,"images/set_a.png","images/set_b.png");
-	buttons[1]=new button("active",694,836,100,30,true,"images/auto_a.png","images/auto_b.png");
-	buttons[2]=new button("manual",786,836,100,30,true,"images/manual_a.png","images/manual_b.png");
-	
-	buttons[3]=new button("blur",409,606,100,30,false,"images/focus_a.png","images/focus_b.png");
-	buttons[4]=new button("tint",409,676,100,30,false,"images/mask_a.png","images/mask_b.png");
-	buttons[5]=new button("zoom", 409,744,100,30,false,"images/zoom_a.png","images/zoom_b.png");
-	
-	buttons[6]=new button("flipchart", 1285,695,100,100,true,"images/sketch_a.png","images/sketch_b.png");
-	buttons[7]=new button("namebubble", 490,839,37,30,true,"images/bubble_a.png","images/bubble_b.png");
-	buttons[8]=new button("ipad", 1413,695,100,100,true,"images/ipad_a.png","images/ipad_b.png");
-
-	buttons[9]=new button("live",643,21,150,50,true,"images/live_a.png","images/live_b.png");
-	buttons[10]=new button("review",800,21,150,50,true,"images/review_a.png","images/review_b.png");
-
-	for(int i=0;i<nButtons;i++) buttonPressed[i]=false;
-	buttonPressed[0]=true;
-	buttonPressed[1]=true;
-	buttonPressed[3]=true;
-	buttonPressed[9]=true;
-	//slider
-	nSliders=3;
-	sliders=new slider*[nSliders];
-	sliders[0]=new slider(517,617,645,0);
-	sliders[1]=new slider(517,687,645,0);	
-	sliders[2]=new slider(517,755,645,0);
-	//other images
-	header.loadImage("images/head.png");
-	shadow.loadImage("images/shadow.png");
-	//talk bubbles
-	nBubbles = 6; 
-	talkBubbles = new talkBubble*[nBubbles];   
-	talkBubbles[0] = new talkBubble(0,0,"--", 100);
-	talkBubbles[1] = new talkBubble(0,0,"--", 100);
-	talkBubbles[2] = new talkBubble(0,0,"--", 100);
-	talkBubbles[3] = new talkBubble(0,0,"--", 100);	
-	talkBubbles[4] = new talkBubble(0,0,"--", 100);	
-	talkBubbles[5] = new talkBubble(0,0,"--", 100);
-	//sketch viewer
-	sketchShareView.initViewer();
-	firstTimeSketchTrigger=true;
-	//webRender
-	webRender.setupWebcore();
-}
-void testApp::setup_mobile(){
-	mobilePixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
-	mobileBlurPixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
-	texMobile.allocate(MOBILE_WIDTH, MOBILE_HEIGHT, GL_RGBA);
-	texMobileBlur.allocate(MOBILE_WIDTH, MOBILE_HEIGHT, GL_RGBA);
-}
-void testApp::update_mobile(){
-	/////////////////// to move to seperate classes, for mobile interface//////////////////////////////////////////
-	int headAbove = 50; //the space above head to be captured
-	int headBelow = MOBILE_HEIGHT - headAbove;
-	int bodyLeft = MOBILE_WIDTH / 2 - 20;
-	int bodyRight = MOBILE_WIDTH / 2;
-
-	int headX = g_kinectGrabber.headXValues[closestID];
-	int headY = g_kinectGrabber.headYValues[closestID];
-	//Next, ensure that yStart & xStart not out of range.
-	int yStart; //the starting Y value to be parsed
-	int xStart; //the starting X value to be parsed
-	if (headY - headAbove < 0) yStart = 0;
-	else if (headY - headAbove + MOBILE_HEIGHT > DEPTH_HEIGHT) yStart = DEPTH_HEIGHT - MOBILE_HEIGHT;
-	else yStart = headY - headAbove;
-
-	if (headX - bodyLeft < 0) xStart = 0;
-	else if (headX - bodyLeft + MOBILE_WIDTH > DEPTH_WIDTH) xStart = DEPTH_WIDTH - MOBILE_WIDTH;
-	else xStart = headX - bodyLeft;
-
-	for( int y = 0 ; y < MOBILE_HEIGHT ; y++ ){
-		for( int x = 0 ; x < MOBILE_WIDTH ; x++ ) {
-		int indexM = y * MOBILE_WIDTH + x;
-		int indexF = (y + yStart) * DEPTH_WIDTH + x + xStart;
-		mobilePixels[4*indexM + 0] = focusPixels[4*indexF + 0];
-		mobilePixels[4*indexM + 1] = focusPixels[4*indexF + 1];
-		mobilePixels[4*indexM + 2] = focusPixels[4*indexF + 2];
-		mobilePixels[4*indexM + 3] = 255;
-
-		mobileBlurPixels[4*indexM + 0] = blurPixels[4*indexF + 0];
-		mobileBlurPixels[4*indexM + 1] = blurPixels[4*indexF + 1];
-		mobileBlurPixels[4*indexM + 2] = blurPixels[4*indexF + 2];
-		mobileBlurPixels[4*indexM + 3] = blurPixels[4*indexF + 3];
-		}
-	}
-	/////////////////// to move to seperate classes, for mobile interface//////////////////////////////////////////
-	texMobile.loadData(mobilePixels,MOBILE_WIDTH,MOBILE_HEIGHT, GL_RGBA);
-	texMobileBlur.loadData(mobileBlurPixels,MOBILE_WIDTH,MOBILE_HEIGHT, GL_RGBA);
-}
-
-void testApp::update_gui(){
-	//gesture
-	gesture.cur_rhPx=g_kinectGrabber.rightHandXValues[closestID];
-	//activating talkBubble in auto mode
-	if(buttonPressed[1]) {
-		talkBubbles[closestID]->active=true; //the active talk bubbles
-		for(int j=closestID+1;j<6;j++) talkBubbles[j]->active=false; //de-active other bubbles
-		for(int j=closestID-1;j>=0;j--) talkBubbles[j]->active=false;
-	}
-	//sketch viewer
-	//if(g_kinectGrabber.headZValues[closestID]>1300) buttonPressed[6]=true;  //tack people's movement
-	//else buttonPressed[6]=false;
-	if(buttonPressed[6]) sketchShareView.close=false;
-	else if(!buttonPressed[8]) sketchShareView.close=true;
-
-	sketchShareView.update(g_kinectGrabber.rightHandXValues[closestID]*scaleParam,g_kinectGrabber.rightHandYValues[closestID]*scaleParam,640+20,0+25);
-
-	if((gesture.last_rhPx!=0) && (gesture.cur_rhPx-gesture.last_rhPx)>100 && buttonPressed[6]){
-		sketchShareView.zoomIn=true;
-		gesture.last_rhPx=gesture.cur_rhPx;
-	}else if (((gesture.cur_rhPx-gesture.last_rhPx)<100 && buttonPressed[6]) || (gesture.last_rhPx==0)) {
-		gesture.last_rhPx=gesture.cur_rhPx;
-	}
-
-	if(buttonPressed[6] && firstTimeSketchTrigger) {
-		sliders[2]->sliderPosX=137;
-		firstTimeSketchTrigger=false;
-	}
-	if(buttonPressed[6]) sketchShareView.close=false;
-	else if(!buttonPressed[6]) {
-		sketchShareView.close=true;
-		sketchShareView.zoomIn=false;
-	}
-	//webRender
-	webRender.updateWebcore();
-	webRender.updateWebcoreCoord(g_kinectGrabber.rightHandXValues[closestID]*scaleParam,g_kinectGrabber.rightHandYValues[closestID]*scaleParam,640+20,0+25);
-	if(buttonPressed[8]) webRender.close=false;
-	else if(!buttonPressed[8]) webRender.close=true;
-}
-
 
 
 void testApp::setup(){	
@@ -349,17 +189,20 @@ void testApp::draw(){
 	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 
 	//draw the mobile version
+	/*
 	texMobile.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT);
 	blur.setBlurParams(4,(float)200/100);
 	blur.beginRender(); 
 	texMobileBlur.draw(0, 0, MOBILE_WIDTH*640/360, MOBILE_HEIGHT);
 	blur.endRender();
 	blur.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT, true);
+	*/
 
 	header.draw(0,0);
 	shadow.draw(0,513);
 	buttons[9]->drawFont(buttonPressed[9]);
 	buttons[10]->drawFont(buttonPressed[10]);
+
 
 	//if buttonPressed[9], LIVE MODE; if buttonPressed[10],RECORD MODE;
 	if(buttonPressed[9]){ //live mode
@@ -389,6 +232,8 @@ void testApp::draw(){
 		//replay and record
 		recAndRep.drawButtons();
 		recAndRep.drawSliders();
+
+		of currentTime=
 		if (recAndRep.getBRightHandUp()){//make func for this in recadnrep
 		ofCircle(60,VIDEO_HEIGHT - 20,20);
 		printf("hands up detected");
@@ -396,6 +241,7 @@ void testApp::draw(){
 		recAndRep.drawSmallButtons();
 	}
 	//draw skeleton
+	/*
 	ofCircle(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,10);
 	ofCircle(leftShoulderX*SCALE+RENDER_WIDTH, leftShoulderY*SCALE+105,10);
 	ofCircle(rightShoulderX*SCALE+RENDER_WIDTH,rightShoulderY*SCALE+105,10); 
@@ -405,6 +251,7 @@ void testApp::draw(){
 	ofLine(leftShoulderX*SCALE+RENDER_WIDTH, leftShoulderY*SCALE+105,leftHandPX*SCALE+RENDER_WIDTH,leftHandPY*SCALE+105);
 	ofLine(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,rightShoulderX*SCALE+RENDER_WIDTH,rightShoulderY*SCALE+105);
 	ofLine(rightShoulderX*SCALE+RENDER_WIDTH,rightShoulderY*SCALE+105,rightHandPX*SCALE+RENDER_WIDTH,rightHandPY*SCALE+105);
+	*/
 	//ofDrawBitmapString (asctime (timeinfo), 1.5*VIDEO_WIDTH + 50, 1.5*VIDEO_HEIGHT + 50);
 	//sketch viewer
 	if(!sketchShareView.close){
@@ -583,3 +430,166 @@ void testApp::mouseReleased(int x, int y, int button){
 void testApp::windowResized(int w, int h){
 
 }
+
+//-------------------------------------------------------------- subfunctions used in setup and update functions
+//--------------------------------------------------------------
+void testApp::setup_bg(){
+	bgColor.r=0;
+	bgColor.g=0;
+	bgColor.b=0;
+	ofBackground(bgColor.r,bgColor.g,bgColor.b);
+	 // set up the blur shader
+	blur.setup(DEPTH_WIDTH, DEPTH_HEIGHT); 
+	thresh=300;
+	//other parameters
+	maskValue=3;
+	rawTime = 0;  
+	confirmSelection=false;
+	lockedPersonID=0;
+}
+void testApp::setup_allocatePixels(){
+	// allocate memory for color,focus and blur pixels
+	colorAlphaPixels =  g_kinectGrabber.Kinect_getRGBBuffer(); //new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	focusPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
+	blurPixels = new unsigned char [DEPTH_WIDTH*DEPTH_HEIGHT*4];
+
+	// allocate memory for textures
+	texColorAlpha.allocate(VIDEO_WIDTH,VIDEO_HEIGHT,GL_RGBA);
+	texFocus.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
+	texBlur.allocate(DEPTH_WIDTH, DEPTH_HEIGHT,GL_RGBA); 
+}
+void testApp::setup_gui(){
+	//gui interface
+	nButtons=11;
+	buttons=new button*[nButtons];
+	buttons[0]=new button("setup",453,839,37,30,true,"images/set_a.png","images/set_b.png");
+	buttons[1]=new button("active",694,836,100,30,true,"images/auto_a.png","images/auto_b.png");
+	buttons[2]=new button("manual",786,836,100,30,true,"images/manual_a.png","images/manual_b.png");
+	
+	buttons[3]=new button("blur",409,606,100,30,false,"images/focus_a.png","images/focus_b.png");
+	buttons[4]=new button("tint",409,676,100,30,false,"images/mask_a.png","images/mask_b.png");
+	buttons[5]=new button("zoom", 409,744,100,30,false,"images/zoom_a.png","images/zoom_b.png");
+	
+	buttons[6]=new button("flipchart", 1285,695,100,100,true,"images/sketch_a.png","images/sketch_b.png");
+	buttons[7]=new button("namebubble", 490,839,37,30,true,"images/bubble_a.png","images/bubble_b.png");
+	buttons[8]=new button("ipad", 1413,695,100,100,true,"images/ipad_a.png","images/ipad_b.png");
+
+	buttons[9]=new button("live",643,21,150,50,true,"images/live_a.png","images/live_b.png");
+	buttons[10]=new button("review",800,21,150,50,true,"images/review_a.png","images/review_b.png");
+
+	for(int i=0;i<nButtons;i++) buttonPressed[i]=false;
+	buttonPressed[0]=true;
+	buttonPressed[1]=true;
+	buttonPressed[3]=true;
+	buttonPressed[9]=true;
+	//slider
+	nSliders=3;
+	sliders=new slider*[nSliders];
+	sliders[0]=new slider(517,617,645,0);
+	sliders[1]=new slider(517,687,645,0);	
+	sliders[2]=new slider(517,755,645,0);
+	//other images
+	header.loadImage("images/head.png");
+	shadow.loadImage("images/shadow.png");
+	//talk bubbles
+	nBubbles = 6; 
+	talkBubbles = new talkBubble*[nBubbles];   
+	talkBubbles[0] = new talkBubble(0,0,"--", 100);
+	talkBubbles[1] = new talkBubble(0,0,"--", 100);
+	talkBubbles[2] = new talkBubble(0,0,"--", 100);
+	talkBubbles[3] = new talkBubble(0,0,"--", 100);	
+	talkBubbles[4] = new talkBubble(0,0,"--", 100);	
+	talkBubbles[5] = new talkBubble(0,0,"--", 100);
+	//sketch viewer
+	sketchShareView.initViewer();
+	firstTimeSketchTrigger=true;
+	//webRender
+	webRender.setupWebcore();
+}
+void testApp::setup_mobile(){
+	mobilePixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
+	mobileBlurPixels = new unsigned char [MOBILE_WIDTH*MOBILE_HEIGHT*4];
+	texMobile.allocate(MOBILE_WIDTH, MOBILE_HEIGHT, GL_RGBA);
+	texMobileBlur.allocate(MOBILE_WIDTH, MOBILE_HEIGHT, GL_RGBA);
+}
+void testApp::update_mobile(){
+	/////////////////// to move to seperate classes, for mobile interface//////////////////////////////////////////
+	int headAbove = 50; //the space above head to be captured
+	int headBelow = MOBILE_HEIGHT - headAbove;
+	int bodyLeft = MOBILE_WIDTH / 2 - 20;
+	int bodyRight = MOBILE_WIDTH / 2;
+
+	int headX = g_kinectGrabber.headXValues[closestID];
+	int headY = g_kinectGrabber.headYValues[closestID];
+	//Next, ensure that yStart & xStart not out of range.
+	int yStart; //the starting Y value to be parsed
+	int xStart; //the starting X value to be parsed
+	if (headY - headAbove < 0) yStart = 0;
+	else if (headY - headAbove + MOBILE_HEIGHT > DEPTH_HEIGHT) yStart = DEPTH_HEIGHT - MOBILE_HEIGHT;
+	else yStart = headY - headAbove;
+
+	if (headX - bodyLeft < 0) xStart = 0;
+	else if (headX - bodyLeft + MOBILE_WIDTH > DEPTH_WIDTH) xStart = DEPTH_WIDTH - MOBILE_WIDTH;
+	else xStart = headX - bodyLeft;
+
+	for( int y = 0 ; y < MOBILE_HEIGHT ; y++ ){
+		for( int x = 0 ; x < MOBILE_WIDTH ; x++ ) {
+		int indexM = y * MOBILE_WIDTH + x;
+		int indexF = (y + yStart) * DEPTH_WIDTH + x + xStart;
+		mobilePixels[4*indexM + 0] = focusPixels[4*indexF + 0];
+		mobilePixels[4*indexM + 1] = focusPixels[4*indexF + 1];
+		mobilePixels[4*indexM + 2] = focusPixels[4*indexF + 2];
+		mobilePixels[4*indexM + 3] = 255;
+
+		mobileBlurPixels[4*indexM + 0] = blurPixels[4*indexF + 0];
+		mobileBlurPixels[4*indexM + 1] = blurPixels[4*indexF + 1];
+		mobileBlurPixels[4*indexM + 2] = blurPixels[4*indexF + 2];
+		mobileBlurPixels[4*indexM + 3] = blurPixels[4*indexF + 3];
+		}
+	}
+	/////////////////// to move to seperate classes, for mobile interface//////////////////////////////////////////
+	texMobile.loadData(mobilePixels,MOBILE_WIDTH,MOBILE_HEIGHT, GL_RGBA);
+	texMobileBlur.loadData(mobileBlurPixels,MOBILE_WIDTH,MOBILE_HEIGHT, GL_RGBA);
+}
+
+void testApp::update_gui(){
+	//gesture
+	gesture.cur_rhPx=g_kinectGrabber.rightHandXValues[closestID];
+	//activating talkBubble in auto mode
+	if(buttonPressed[1]) {
+		talkBubbles[closestID]->active=true; //the active talk bubbles
+		for(int j=closestID+1;j<6;j++) talkBubbles[j]->active=false; //de-active other bubbles
+		for(int j=closestID-1;j>=0;j--) talkBubbles[j]->active=false;
+	}
+	//sketch viewer
+	//if(g_kinectGrabber.headZValues[closestID]>1300) buttonPressed[6]=true;  //tack people's movement
+	//else buttonPressed[6]=false;
+	if(buttonPressed[6]) sketchShareView.close=false;
+	else if(!buttonPressed[8]) sketchShareView.close=true;
+
+	sketchShareView.update(g_kinectGrabber.rightHandXValues[closestID]*scaleParam,g_kinectGrabber.rightHandYValues[closestID]*scaleParam,640+20,0+25);
+
+	if((gesture.last_rhPx!=0) && (gesture.cur_rhPx-gesture.last_rhPx)>100 && buttonPressed[6]){
+		sketchShareView.zoomIn=true;
+		gesture.last_rhPx=gesture.cur_rhPx;
+	}else if (((gesture.cur_rhPx-gesture.last_rhPx)<100 && buttonPressed[6]) || (gesture.last_rhPx==0)) {
+		gesture.last_rhPx=gesture.cur_rhPx;
+	}
+
+	if(buttonPressed[6] && firstTimeSketchTrigger) {
+		sliders[2]->sliderPosX=137;
+		firstTimeSketchTrigger=false;
+	}
+	if(buttonPressed[6]) sketchShareView.close=false;
+	else if(!buttonPressed[6]) {
+		sketchShareView.close=true;
+		sketchShareView.zoomIn=false;
+	}
+	//webRender
+	webRender.updateWebcore();
+	webRender.updateWebcoreCoord(g_kinectGrabber.rightHandXValues[closestID]*scaleParam,g_kinectGrabber.rightHandYValues[closestID]*scaleParam,640+20,0+25);
+	if(buttonPressed[8]) webRender.close=false;
+	else if(!buttonPressed[8]) webRender.close=true;
+}
+
+
