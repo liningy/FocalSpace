@@ -21,7 +21,8 @@ public:
 	/// make sure you recorded the video frames or reading them will fail big time!
 	void setup(const string & file, const string & fileInt, bool video=false);
 	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> updatea();
-	pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, int>>>>>>>>>> updateInt();
+	pair<int, pair<int, int>> updateSideInfo();
+	bool checkEndOfSideFile() {return std::feof(fInt);};
 	void seek(int frameNo);
 	void update();
 	void draw(float x, float y);
@@ -90,11 +91,15 @@ private:
 	int leftshoulderx, leftshouldery, rightshoulderx, rightshouldery, lefthandx, lefthandy, righthandx, righthandy;
 	bool righthandraised;
 	time_t rawTime;
-	int nFrames, rhrFrame1, rhrFrame2, rhrFrame3, rhrFrame4, rhrFrame5, rhrFrame6, rhrFrame7, rhrFrame8, rhrFrame9, rhrFrame10;
+
 	int size; //size in bytes of one frame
 	int frameLoc; //size in bytes that we want to skip (from beginning)
 	//int framesPerSecond; //recorded fps, use: to set playback fps
 	//int fpsOffset; //hard coded difference between playback and recording frames per second
 	//ofxKinectCalibration calibration;
+
+	int genCat;
+	int specCat;
+	int nFrames;
 };
 

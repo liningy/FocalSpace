@@ -21,7 +21,7 @@ ofxKinectPlayer::ofxKinectPlayer(){
 	rgb = 0;
 	depthbuff = 0;
 	bUseTexture = true;
-	fps = 30;//default is 30. it is set again in updateInt
+	fps = 30;//default is 30. it can be set again in updateSideInfo with some more code if desired
 	//fpsOffset = 8.2;
 }
 
@@ -109,31 +109,30 @@ pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int
 }
 
 //-----------------------------------------------------------
-pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, int>>>>>>>>>> ofxKinectPlayer::updateInt(){
+
+pair<int, pair<int, int>> ofxKinectPlayer::updateSideInfo(){
 	if(!fInt){
 		printf("error!");
 	}
-	fread(&rhrFrame1,sizeof(int),1,fInt);
-	fread(&rhrFrame2,sizeof(int),1,fInt);
-	fread(&rhrFrame3,sizeof(int),1,fInt);
-	fread(&rhrFrame4,sizeof(int),1,fInt);
-	fread(&rhrFrame5,sizeof(int),1,fInt);
-	fread(&rhrFrame6,sizeof(int),1,fInt);
-	fread(&rhrFrame7,sizeof(int),1,fInt);
-	fread(&rhrFrame8,sizeof(int),1,fInt);
-	fread(&rhrFrame9,sizeof(int),1,fInt);
-	fread(&rhrFrame10,sizeof(int),1,fInt);
-	fread(&nFrames,sizeof(int),1,fInt);
-	//fread(&framesPerSecond,sizeof(int),1,fInt);
-	//if (framesPerSecond != 0){//TODO this if may not be necessary
-	//	fps = framesPerSecond - fpsOffset;
-	//}
+
 	// loop?
 	if(bLoop && std::feof(fInt) > 0) {
 		fInt = fopen(ofToDataPath(filenameInt).c_str(), "rb");
 	}
-	return make_pair(nFrames,make_pair(rhrFrame1,make_pair(rhrFrame2,make_pair(rhrFrame3,make_pair(rhrFrame4,make_pair(rhrFrame5,make_pair(rhrFrame6,make_pair(rhrFrame7,make_pair(rhrFrame8,make_pair(rhrFrame9,rhrFrame10))))))))));
+
+	fread(&genCat,sizeof(int),1,fInt);
+	fread(&specCat,sizeof(int),1,fInt);
+	fread(&nFrames,sizeof(int),1,fInt);
+
+	//fread(&framesPerSecond,sizeof(int),1,fInt);
+	//if (framesPerSecond != 0){//TODO this if may not be necessary
+	//	fps = framesPerSecond - fpsOffset;
+	//}
+
+
+	return make_pair(genCat,make_pair(specCat, nFrames));
 }
+
 //-----------------------------------------------------------
 void ofxKinectPlayer::seek(int frameNo){
 	frameLoc = frameNo*size;

@@ -103,7 +103,7 @@ void recordAndReplay::storeFrame(unsigned char* colorAlphaPixels, unsigned char 
 	numRecordedFrames ++;
 	myTags.checkRightHandUp(rightHandPY,headPositionY); //(every call to this increments a pointer - if right hand is raised. So do it only once per frame)
 	if (myTags.getBRightHandUp()){//if there are more kinds of gestures and audio, send all of them together at end (otherwise, order will get mixed up I believe),but not with suggested improvement
-		kinectRecorder.storeInt(nFrames,false);
+		kinectRecorder.storeSideInfo(1,0,nFrames);
 	}
 }
 //======================================================================
@@ -140,11 +140,10 @@ void recordAndReplay::stopRecording() {
 
 	//video
 	if (nFrames != 0) { //without this, nFrames in recordingInfo would be overwritten with 0 when playback started (since it stops recording first)
-		kinectRecorder.storeInt(nFrames, true);
-		//kinectRecorder.storeInt(videoFrameDelay, false);//the true above wraps up gestures (adds -1's for empty gestures)
-													//it's not needed here
+		kinectRecorder.storeSideInfo(0,0,nFrames);
 	}
 	kinectRecorder.close();
+	myTags.close();
 	safeResetLiveMode();
 }
 
@@ -156,7 +155,6 @@ void recordAndReplay::startPlayback() {
 	}
 	kinectPlayer.setup(ofToDataPath("recording.dat"), ofToDataPath("recordingInfo.dat"), true); // set record file and source
 	kinectPlayer.loop();
-	myTags.resetTags(); //reset TagCounters
 	getPlaybackRange();
 	if (bPlayback && paused){//if already playing, unpause
 		standardReplay();
@@ -169,8 +167,8 @@ void recordAndReplay::startPlayback() {
 
 void recordAndReplay::stopPlayback() {
 	kinectPlayer.close();
+	myTags.close();
 	bPlayback = false;
-	myTags.resetTags(); //reset TagCounters
 	nFramesValid = false;
 	safeResetLiveMode();
 
@@ -214,18 +212,12 @@ void recordAndReplay::safeResetLiveMode(){//intended to wrok if you're already i
 /////function to get the number of frames (and where each type of gesture is)
 //2 (one of the more important changes)
 void recordAndReplay::getPlaybackRange(){ 
-	frameInfo = kinectPlayer.updateInt();
-	nFrames = frameInfo.first;
-	myTags.setRHR(0, frameInfo.second.first);
-	myTags.setRHR(1, frameInfo.second.second.first);
-	myTags.setRHR(2, frameInfo.second.second.second.first);
-	myTags.setRHR(3, frameInfo.second.second.second.second.first);
-	myTags.setRHR(4, frameInfo.second.second.second.second.second.first);
-	myTags.setRHR(5, frameInfo.second.second.second.second.second.second.first);
-	myTags.setRHR(6, frameInfo.second.second.second.second.second.second.second.first);
-	myTags.setRHR(7, frameInfo.second.second.second.second.second.second.second.second.first);
-	myTags.setRHR(8, frameInfo.second.second.second.second.second.second.second.second.second.first);
-	myTags.setRHR(9, frameInfo.second.second.second.second.second.second.second.second.second.second);
+
+	while (!kinectPlayer.checkEndOfSideFile()){
+		sideInfo = kinectPlayer.updateSideInfo();
+		myTags.setTagInfo(sideInfo.first, sideInfo.second.first, sideInfo.second.second);
+	}
+	nFrames = myTags.getTagInfo(0,0,0);
 	nFramesValid = true;
 	//2
 }
@@ -323,9 +315,10 @@ void recordAndReplay::drawSliders(){
 void recordAndReplay::drawSmallButtons(){
 	if (smallButtonActive && nFramesValid){	// nFramesValid should imply playback
 		for (int i = 0;i<maxNoIndices;i++){
-			if (myTags.getRHR(i) !=-1){//TODO: should be modified to be generalizable. Also, if it is equal to ,
+			currNum = myTags.getTagInfo(1,0,i);
+			if (currNum !=-1){
 				ofEnableAlphaBlending();
-				tempButtonX = (int) ((float) timerStartX + ((float) myTags.getRHR(i)/(float) nFrames)*timerWidth);
+				tempButtonX = (int) ((float) timerStartX + ((float) currNum/(float) nFrames)*timerWidth);
 				smallGoodImg.draw(tempButtonX,timerStartY + timerHeight);
 				ofSetColor(100,100,100);
 				ofLine(tempButtonX - 10,timerStartY,tempButtonX - 10, timerStartY + timerHeight);//"good idea button" range lines
@@ -333,9 +326,9 @@ void recordAndReplay::drawSmallButtons(){
 				ofSetColor(255,255,255);
 				ofDisableAlphaBlending();
 			}
-			else{
-				break;//TODO: are breaks recomended? Anyways, if any in current gesture are 0, all remaining are so we can skip them
-			}
+			//else{
+			//	break;//TODO: are breaks recomended? Anyways, if any in current gesture are 0, all remaining are so we can skip them
+			//}
 		}
 	}	
 }

@@ -14,15 +14,43 @@ void tags::init(){
 	for(int i=0;i<10;i++){
 		smallRHULocations[i] = 0;//initializes first to 0, and all unspecified ones to 0
 	}
+	resetTags();
 }
-void tags::resetTags() {
-	resetRHR();
+
+void tags::resetTagCounters(){
+	for (int i = 0; i < lenGenCat; i++){
+		for (int j = 0; j < lenSpecCat; j ++){
+			for (int k = 0; k < lenGesArray; k ++){
+				tagCounters[i][j][k] = 0;
+			}
+		}
+	}
 }
-int tags::getRHR(int index) {
-	return smallRHULocations[index];
+
+void tags::resetTagInfo(){
+	for (int i = 0; i < lenGenCat; i++){
+		for (int j = 0; j < lenSpecCat; j ++){
+			for (int k = 0; k < lenGesArray; k ++){
+				tagInfo[i][j][k] = -1;
+			}
+		}
+	}
 }
-void tags::setRHR(int index, int value) {
-	smallRHULocations[index] = value;
+
+void tags::resetTags(){
+	resetTagInfo();
+	resetTagCounters();
+}
+
+void tags::setTagInfo(int genCat, int specCat, int value){
+	currCounter = tagCounters[genCat][specCat][0];
+	tagInfo[genCat][specCat][currCounter] = value;
+	currCounter = (currCounter + 1) % lenGesArray;
+	tagCounters[genCat][specCat][0] = currCounter;
+}
+int tags::getTagInfo(int genCat, int specCat, int index){
+	return tagInfo[genCat][specCat][index];
+
 }
 /////GESTURE CHECKS (return booleans)
 void tags::checkRightHandUp(int rightHandPY, int headPositionY){
@@ -48,4 +76,5 @@ void tags::close(){
 	for(int i=0;i<10;i++){
 		smallRHULocations[i] = 0;//initializes first to 0, and all unspecified ones to 0
 	}
+	resetTags();
 }

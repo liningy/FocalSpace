@@ -236,8 +236,8 @@ void testApp::draw(){
 
 		//Lining of currentTime=
 		if (recAndRep.getBRightHandUp()){//make func for this in recadnrep
-		ofCircle(60,VIDEO_HEIGHT - 20,20);
-		printf("hands up detected");
+			ofCircle(60,VIDEO_HEIGHT - 20,20);
+			printf("hands up detected");
 		}
 		recAndRep.drawSmallButtons();
 	}
@@ -411,13 +411,25 @@ void testApp::mousePressed(int x, int y, int button){
 		recAndRep.setSmallButtonActive(true);
 	}
 	else if (recAndRep.getTimerSliderPressed(x,y).first){
-		if (recAndRep.getBPlayback() && !recAndRep.getPaused()){
-			recAndRep.skipTo(recAndRep.getTimerSliderPressed(x,y).second);
+		if (recAndRep.getBPlayback()){
+			if (!recAndRep.getPaused()){
+				recAndRep.skipTo(recAndRep.getTimerSliderPressed(x,y).second);
+			}
+			else{
+				recAndRep.play();//Note: if program is paused b/n this and the pause that skip to does, then the buttons will be incorrect (it will look like it's paused while it's not)
+				recAndRep.skipTo(recAndRep.getTimerSliderPressed(x,y).second);
+			}
 		}
 	}
 	else if (recAndRep.getSecondSliderPressed(x,y).first){
-		if (recAndRep.getBPlayback() && !recAndRep.getPaused()){
-			recAndRep.skipTo(recAndRep.getSecondSliderPressed(x,y).second);
+		if (recAndRep.getBPlayback()){
+			if (!recAndRep.getPaused()){
+				recAndRep.skipTo(recAndRep.getSecondSliderPressed(x,y).second);
+			}
+			else{
+				recAndRep.play();
+				recAndRep.skipTo(recAndRep.getSecondSliderPressed(x,y).second);
+			}
 		}
 	}
 }

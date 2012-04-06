@@ -15,17 +15,28 @@ public:
 	virtual ~ofxKinectRecorder();
 	void init(const string & filename, const string & filenameInt);
     void newFrame(unsigned char* rgb = NULL, unsigned char * raw_depth = NULL, time_t = NULL, int headx = NULL, int heady = NULL, int headz = NULL, int leftshoulderx = NULL, int leftshouldery = NULL, int rightshoulderx = NULL, int rightshouldery = NULL, int lefthandx = NULL, int lefthandy = NULL, int righthandx = NULL, int righthandy = NULL, USHORT* depthbuff = NULL);
-	void storeInt(int frameNo = NULL, bool endOfRecording = false);//note gestures are written in pairs of 10, and number of Frames comes at the end
-	
+	void storeSideInfo(int genCat = NULL, int specCat = NULL, int frameNo = NULL);//keeps track of gestures and stuff
+	/*
+	Guide:
+	genCat 0 = number of frames
+		specCat 0 = number of frames
+	genCat 1 = gestures
+		specCat 0 = thumbs up
+	genCat 2 = faces
+		specCat 0 = person ID 0
+		specCat 1 = person ID 1
+		specCat 2 = person ID 2
+		specCat 3 = person ID 3
+		specCat 4 = person ID 4
+		specCat 5 = person ID 5
+	*/
 	void close();
+
 	bool isOpened();
 
 private:
 	FILE * f;
 
 	FILE * fInt;
-	int maxNoIndices; //the maximum number of gesture or audio indices accepted. It will ignore anything given to it past this number
-	int indexCount; //counts number of recorded gesture or audio indices (to make sure each has maxNoIndices amount)
-	int negOne;
 	//bool nFramesRecorded;//true if we've already recorded nFrames in fInt (used to make fps enter fInt without being considered a gesture)
 };

@@ -143,6 +143,8 @@ private:
 	pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int,
 		pair<int, int>>>>>>>>>> frameInfo;//variable that accepts the variables that kinectPlayerInfo sends (nFrames and gesture audio indices)
 
+	pair<int,pair<int,int>> sideInfo;
+
 	//======================================================================
 	//GUI PRIVATE SECTION
 	/////Buttons
@@ -164,6 +166,7 @@ private:
 	int tempButtonX;
 	int rhrIndex; //the index of the index after the last currently  filled slot in the small RHRLocations array
 	int maxNoIndices; //the max of each kind of gesture of audio allowable
+	int currNum; //holder for frame no recovered from tagInfo
 	/////Sliders
 	slider* timer;
 	slider* secondSlider; //(right below first and with similar parameters). Use: To be able to click on gesture symols and stuff

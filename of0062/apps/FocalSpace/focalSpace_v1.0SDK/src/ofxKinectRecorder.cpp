@@ -17,12 +17,11 @@ ofxKinectRecorder::~ofxKinectRecorder() {
 }
 
 void ofxKinectRecorder::init(const string & filename, const string & filenameInt){
+	
 	f = fopen(ofToDataPath(filename).c_str(),"wb");
 
 	fInt = fopen(ofToDataPath(filenameInt).c_str(),"wb");
-	maxNoIndices = 10;
-	indexCount = 0;
-	negOne = -1;//default value to be written on unused index positions
+	
 	//nFramesRecorded = false;
 }
 
@@ -48,34 +47,12 @@ void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, 
 	fwrite(&righthandy,sizeof(int),1,f);
 	fwrite(depthbuff,640*480*2,1,f);
 }
-/* endOfRecording is true when the video has ended (and we're out of gestures. future - it should also be true when switching b/n gestures)
-*/
-void ofxKinectRecorder::storeInt(int frameNo, bool endOfRecording){
-	if (!fInt) return;
-	if(frameNo || frameNo == 0){
-		if (endOfRecording){
-			while(indexCount<maxNoIndices){//if end of frame but still haven't recorded maxNoIndices, then record a bunch of negative ones
-				fwrite(&negOne,sizeof(int),1,fInt);
-				indexCount++;
-			}
-			indexCount = 0;
-			fwrite(&frameNo,sizeof(int),1,fInt);
-			//nFramesRecorded = true;
-		}
-		//else if (nFramesRecorded){
-		//	fwrite(&frameNo,sizeof(int),1,fInt);
-		//	nFramesRecorded = false;//resets nFramesRecorded
-		//}
-		else if (indexCount<maxNoIndices){
-				fwrite(&frameNo,sizeof(int),1,fInt);
-				indexCount++;
-		}
-		else{
-			printf("error in record information storage");
-		}
-	}
-}
 
+void ofxKinectRecorder::storeSideInfo(int genCat, int specCat, int frameNo){
+	fwrite(&genCat,sizeof(int),1,fInt);
+	fwrite(&specCat,sizeof(int),1,fInt);
+	fwrite(&frameNo,sizeof(int),1,fInt);
+}
 void ofxKinectRecorder::close(){
 	if(f){
 		fclose(f);
@@ -85,9 +62,6 @@ void ofxKinectRecorder::close(){
 		fclose(fInt);
 		fInt=0;
 	}
-	maxNoIndices = 10;
-	indexCount = 0;
-	int negOne = -1;
 }
 
 bool ofxKinectRecorder::isOpened(){
