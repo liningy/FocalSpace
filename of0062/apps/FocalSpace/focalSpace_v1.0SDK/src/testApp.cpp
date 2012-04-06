@@ -82,11 +82,7 @@ void testApp::update(){
 	timeinfo = localtime (&rawTime );
 
 	if(colorAlphaPixels != NULL) texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA); // load the RGBA values into a texture
-	
-	if(recAndRep.getBRecord()){
-		recAndRep.storeFrame(colorAlphaPixels, grayPixels, rawTime, headPositionX, headPositionY, headPositionZ, leftShoulderX, leftShoulderY, rightShoulderX,
-							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, depthBuff);
-	}
+
 
 	// TODO: move this somewhere else. Probably goes in the conference.cpp file?
 	// Find the skeleton index of the individuals head position is closest to that of the audio position.
@@ -155,6 +151,10 @@ void testApp::update(){
 	texBlur.loadData(blurPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
 	update_gui();
 
+	if(recAndRep.getBRecord()){
+		recAndRep.storeFrame(colorAlphaPixels, grayPixels, rawTime, headPositionX, headPositionY, headPositionZ, leftShoulderX, leftShoulderY, rightShoulderX,
+							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, depthBuff, closestID);
+	}
 }
 
 //--------------------------------------------------------------
@@ -190,14 +190,14 @@ void testApp::draw(){
 	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 
 	//draw the mobile version
-	/*
+	
 	texMobile.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT);
 	blur.setBlurParams(4,(float)200/100);
 	blur.beginRender(); 
 	texMobileBlur.draw(0, 0, MOBILE_WIDTH*640/360, MOBILE_HEIGHT);
 	blur.endRender();
 	blur.draw(0+1610, 0, MOBILE_WIDTH, MOBILE_HEIGHT, true);
-	*/
+	
 
 	header.draw(0,0);
 	shadow.draw(0,513);
@@ -241,6 +241,7 @@ void testApp::draw(){
 		}
 		recAndRep.drawSmallButtons();
 	}
+	ofCircle( g_kinectGrabber.headXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.headYValues[closestID]*SCALE+105,10);	
 	//draw skeleton
 	/*
 	ofCircle(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,10);
@@ -396,7 +397,6 @@ void testApp::mousePressed(int x, int y, int button){
 	if(buttonPressed[2] && y<480){
 			confirmSelection=!confirmSelection;
 	}
-
 	//replay and record
 	if (recAndRep.getStopButtonPressed(x,y)){
 		recAndRep.standardStop();
@@ -408,7 +408,25 @@ void testApp::mousePressed(int x, int y, int button){
 		recAndRep.standardRecord();
 	}
 	else if (recAndRep.getGoodIdeaButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(true);
+		recAndRep.setSmallButtonActive(7);
+	}
+	else if (recAndRep.getZeroButtonPressed(x,y)){
+		recAndRep.setSmallButtonActive(0);
+	}
+	else if (recAndRep.getOneButtonPressed(x,y)){
+		recAndRep.setSmallButtonActive(1);
+	}
+	else if (recAndRep.getTwoButtonPressed(x,y)){
+		recAndRep.setSmallButtonActive(2);
+	}
+	else if (recAndRep.getThreeButtonPressed(x,y)){
+		recAndRep.setSmallButtonActive(3);
+	}
+	else if (recAndRep.getFourButtonPressed(x,y)){
+		recAndRep.setSmallButtonActive(4);
+	}
+	else if (recAndRep.getFiveButtonPressed(x,y)){
+		recAndRep.setSmallButtonActive(5);
 	}
 	else if (recAndRep.getTimerSliderPressed(x,y).first){
 		if (recAndRep.getBPlayback()){

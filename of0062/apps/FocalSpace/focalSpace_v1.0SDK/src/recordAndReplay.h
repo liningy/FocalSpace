@@ -30,7 +30,8 @@ public:
 	/// interface with testApp
 	void readFrame(); //(sets the variables testApp is going to read - is called during playback)
 	void storeFrame(unsigned char* colorAlphaPixels, unsigned char * grayPixels, time_t rawTime, int headPositionX, int headPositionY, int headPositionZ,
-					int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY, USHORT* depthBuff);
+					int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY, USHORT* depthBuff,
+					int closID);
 	void drawButtons();
 	void drawSmallButtons();
 	void drawSliders();
@@ -70,12 +71,19 @@ public:
 	bool getBRecord() {return bRecord;};
 	bool getBPlayback() {return bPlayback;};
 	bool getPaused() {return paused;};
-	void setSmallButtonActive(bool newValue) {smallButtonActive = newValue;};
+	void setSmallButtonActive(int newValue) {smallButtonActive = newValue;};
 	bool getStopButtonActive() {return stopButtonActive;};
 	bool getReplayButtonActive() {return replayButtonActive;};
 	bool getRecordButtonActive() {return recordButtonActive;};
 	bool getGoodIdeaButtonActive() {return goodIdeaButtonActive;};
+	bool getTalkingHeadButtonActive() {return talkingHeadButtonActive;};
 	bool getPauseButtonOn() {return pauseButtonOn;};
+	bool getZeroButtonActive() {return zeroButtonActive;};
+	bool getOneButtonActive() {return oneButtonActive;};
+	bool getTwoButtonActive() {return twoButtonActive;};
+	bool getThreeButtonActive() {return threeButtonActive;};
+	bool getFourButtonActive() {return fourButtonActive;};
+	bool getFiveButtonActive() {return fiveButtonActive;};
 	//TODO: maybe change the below to use, if not null, then - otherwise print an error
 	//as of now, this function will return an unexpected value if it is called before any nextFrame call,
 	//or maybe give them default values, and explain that if no value is assigned the default will be returned
@@ -102,13 +110,20 @@ public:
 	bool getReplayButtonPressed(int x,int y) {return (*replayButton).buttonPressed(x,y);};
 	bool getRecordButtonPressed(int x,int y) {return (*recordButton).buttonPressed(x,y);};
 	bool getGoodIdeaButtonPressed(int x,int y) {return (*goodIdeaButton).buttonPressed(x,y);};
+	bool getTalkingHeadButtonPressed(int x,int y) {return (*talkingHeadButton).buttonPressed(x,y);};
+	bool getZeroButtonPressed(int x,int y) {return (*zeroButton).buttonPressed(x,y);};
+	bool getOneButtonPressed(int x,int y) {return (*oneButton).buttonPressed(x,y);};
+	bool getTwoButtonPressed(int x,int y) {return (*twoButton).buttonPressed(x,y);};
+	bool getThreeButtonPressed(int x,int y) {return (*threeButton).buttonPressed(x,y);};
+	bool getFourButtonPressed(int x,int y) {return (*fourButton).buttonPressed(x,y);};
+	bool getFiveButtonPressed(int x,int y) {return (*fiveButton).buttonPressed(x,y);};
 	//gesture - since i made recAndRep be the middle man b/n tags and testApp
 	bool getBRightHandUp();
 	//slider
 	ofImage timelineImg;
 
 private:
-	int VIDEO_WIDTH;
+	int VIDEO_WIDTH; //TODO: in future can put this into one file (like "videoConstants" and use it for otehr files as well)
 	int VIDEO_HEIGHT;
 
 	ofxKinectRecorder 	kinectRecorder; //accepts variables and stores them externally
@@ -122,7 +137,7 @@ private:
 	int currFrame; //the frame number of the frame you are currently replaying (always <= nFrames)
 	bool paused; //stores whether playback is currently paused or not
 	bool nFramesValid; //is whether nFrames is valid or not
-
+	int closestID; //keeps track of the closestID;
 	/////Time
 	int lastPlaybackTime; //timestamp of the last frame in the recording
 	time_t firstPlaybackTime; //timestamp of the first frame in the recording
@@ -135,7 +150,13 @@ private:
 	bool pauseButtonOn;//checks whetehr replay button should change or not (true = it should be pause)
 	bool goodIdeaButtonActive;
 	bool talkingHeadButtonActive;
-	bool smallButtonActive;
+	int smallButtonActive; //only one can be active at a time (0=zero, 1=one... 7=smallGood)
+	bool zeroButtonActive;
+	bool oneButtonActive;
+	bool twoButtonActive;
+	bool threeButtonActive;
+	bool fourButtonActive;
+	bool fiveButtonActive;
 
 	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
 		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> rgbdepthpair;//variable that accepts the variables that kinectPlayer sends
@@ -154,19 +175,34 @@ private:
 	button* recordButton;
 	button* goodIdeaButton;
 	button* talkingHeadButton;
+	button* zeroButton;
+	button* oneButton;
+	button* twoButton;
+	button* threeButton;
+	button* fourButton;
+	button* fiveButton;
 	/////Button picture dimensions
 	int buttonWidth; //in pixels
 	int buttonHeight;// this and the above are the height and width for buttons (stop, record, replay and pause all have these dimensions)
 	int goodIdeaButtonWidth;
 	int goodIdeaButtonHeight;
-	int smallGoodButtonHeight; //this is helpful to the second slider that skips to where you click (but below the main slider)
-	int smallGoodButtonWidth;
+	int smallButtonHeight; //this is helpful to the second slider that skips to where you click (but below the main slider)
+	int smallButtonWidth;
 	///// Small Button variables & helpers
 	ofImage smallGoodImg;
+	ofImage smallZeroImg;
+	ofImage smallOneImg;
+	ofImage smallTwoImg;
+	ofImage smallThreeImg;
+	ofImage smallFourImg;
+	ofImage smallFiveImg;
+	ofImage tempSmallImg; 
 	int tempButtonX;
 	int rhrIndex; //the index of the index after the last currently  filled slot in the small RHRLocations array
 	int maxNoIndices; //the max of each kind of gesture of audio allowable
 	int currNum; //holder for frame no recovered from tagInfo
+	int gen; //genCat for button (TODO: in future can implement buttons as arrays of buttons)
+	int spec; //specCat for button
 	/////Sliders
 	slider* timer;
 	slider* secondSlider; //(right below first and with similar parameters). Use: To be able to click on gesture symols and stuff

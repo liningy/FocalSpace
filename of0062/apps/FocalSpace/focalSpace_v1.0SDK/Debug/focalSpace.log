@@ -1,4 +1,4 @@
-﻿Build started 4/5/2012 10:05:39 PM.
+﻿Build started 4/6/2012 12:26:10 AM.
      1>Project "C:\Users\Tony\FocalSpace\of0062\apps\FocalSpace\focalSpace_v1.0SDK\focalSpace.vcxproj" on node 3 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\focalSpace.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -7,7 +7,7 @@
          testApp.cpp
      1>c:\users\tony\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\grabvideo.h(28): warning C4005: 'NUI_SKELETON_COUNT' : macro redefinition
                  c:\program files\microsoft sdks\kinect\v1.0\inc\nuisensor.h(98) : see previous definition of 'NUI_SKELETON_COUNT'
-     1>c:\users\tony\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\testapp.cpp(332): warning C4995: 'sprintf': name was marked as #pragma deprecated
+     1>c:\users\tony\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\testapp.cpp(333): warning C4995: 'sprintf': name was marked as #pragma deprecated
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
@@ -83,4 +83,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:07.27
+Time Elapsed 00:00:07.11
