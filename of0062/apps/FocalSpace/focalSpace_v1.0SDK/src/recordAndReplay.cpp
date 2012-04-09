@@ -258,6 +258,12 @@ void recordAndReplay::skipTo(float percentOfSlider){//it only works while you ar
 }
 
 /////BUTTON CONTROL SECTION
+
+void recordAndReplay::setSmallButtonActive(int newValue){
+	smallButtonActive = newValue;
+	if (smallButtonActive == 6){blurOn == false;}
+	else if (smallButtonActive >= 0 && smallButtonActive <= 5){blurOn == false;}
+}
 void recordAndReplay::standardStop(){
 		if (bRecord){
 			stopRecording();

@@ -185,7 +185,9 @@ void testApp::draw(){
 	//draw another blured layer on top, with alpha(skeleton)=0;
 	blur.setBlurParams(4,(float)blurParam/100);
 	blur.beginRender();
-	texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
+	if (!recAndRep.getBPlayback() || recAndRep.getBlurOn()){//blur if either not playback or if not blurOn
+		texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
+	}
 	blur.endRender();
 	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 

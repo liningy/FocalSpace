@@ -71,7 +71,7 @@ public:
 	bool getBRecord() {return bRecord;};
 	bool getBPlayback() {return bPlayback;};
 	bool getPaused() {return paused;};
-	void setSmallButtonActive(int newValue) {smallButtonActive = newValue;};
+	void setSmallButtonActive(int newValue);
 	bool getStopButtonActive() {return stopButtonActive;};
 	bool getReplayButtonActive() {return replayButtonActive;};
 	bool getRecordButtonActive() {return recordButtonActive;};
@@ -119,6 +119,8 @@ public:
 	bool getFiveButtonPressed(int x,int y) {return (*fiveButton).buttonPressed(x,y);};
 	//gesture - since i made recAndRep be the middle man b/n tags and testApp
 	bool getBRightHandUp();
+	//blur
+	bool getBlurOn(){return blurOn;};
 	//slider
 	ofImage timelineImg;
 
@@ -138,6 +140,7 @@ private:
 	bool paused; //stores whether playback is currently paused or not
 	bool nFramesValid; //is whether nFrames is valid or not
 	int closestID; //keeps track of the closestID;
+	bool blurOn; //keeps track of whether the blur is currently on or not
 	/////Time
 	int lastPlaybackTime; //timestamp of the last frame in the recording
 	time_t firstPlaybackTime; //timestamp of the first frame in the recording
