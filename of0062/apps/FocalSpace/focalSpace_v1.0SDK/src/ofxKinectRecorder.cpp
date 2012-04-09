@@ -25,7 +25,10 @@ void ofxKinectRecorder::init(const string & filename, const string & filenameInt
 	//nFramesRecorded = false;
 }
 
-void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, time_t rawtime, int headx, int heady, int headz, int leftshoulderx, int leftshouldery, int rightshoulderx, int rightshouldery, int lefthandx, int lefthandy, int righthandx, int righthandy, USHORT* depthbuff) {
+void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, time_t rawtime, int headx, int heady, int headz, int leftshoulderx, int leftshouldery,
+								int rightshoulderx, int rightshouldery, int lefthandx, int lefthandy, int righthandx, int righthandy, int faceOneID, int faceOneX, 
+								int faceOneY, int faceOneZ, int faceTwoID, int faceTwoX, int faceTwoY, int faceTwoZ,  USHORT* depthbuff, unsigned char* blurPixels,
+								int closID) {
 	if(!f ||!raw_depth) return;
 
 	if(rgb != NULL) {
@@ -45,7 +48,20 @@ void ofxKinectRecorder::newFrame(unsigned char* rgb, unsigned char * raw_depth, 
 	fwrite(&lefthandy,sizeof(int),1,f);
 	fwrite(&righthandx,sizeof(int),1,f);
 	fwrite(&righthandy,sizeof(int),1,f);
+
+	fwrite(&faceOneID,sizeof(int),1,f);
+	fwrite(&faceOneX,sizeof(int),1,f);
+	fwrite(&faceOneY,sizeof(int),1,f);
+	fwrite(&faceOneZ,sizeof(int),1,f);
+	fwrite(&faceTwoID,sizeof(int),1,f);
+	fwrite(&faceTwoX,sizeof(int),1,f);
+	fwrite(&faceTwoY,sizeof(int),1,f);
+	fwrite(&faceTwoZ,sizeof(int),1,f);
+
 	fwrite(depthbuff,640*480*2,1,f);
+	fwrite(blurPixels,640*480*4,1,f);
+
+	fwrite(&closID,sizeof(int),1,f);
 }
 
 void ofxKinectRecorder::storeSideInfo(int genCat, int specCat, int frameNo){

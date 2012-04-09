@@ -13,6 +13,15 @@ void testApp::setup(){
 	setup_allocatePixels();
 	setup_mobile();
 	setup_gui();
+	noFacesStored = 0;
+	faceOneID = -1;
+	faceOneX = defaultJointValue;
+	faceOneY = defaultJointValue;
+	faceOneZ = defaultJointValue;
+	faceTwoID = -1;
+	faceTwoX = defaultJointValue;
+	faceTwoY = defaultJointValue;
+	faceTwoZ = defaultJointValue;
 }
 
 //--------------------------------------------------------------
@@ -148,12 +157,58 @@ void testApp::update(){
 	
 	update_mobile();
 	texFocus.loadData(focusPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
-	texBlur.loadData(blurPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
+	if (recAndRep.getBPlayback()){//not sure if the if's below are imprtant any more
+		if(recAndRep.getBlurOn()){
+			texBlur.loadData(recAndRep.getBlurPixels(),DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
+		}
+		else{
+			texBlur.loadData(recAndRep.getColorAlphaPixels(),DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);//color alpha is same as focus i think
+			//texBlur.loadData(focusPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);//color alpha is same as focus i think
+		}
+	}
+	else{
+		texBlur.loadData(blurPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
+	}
 	update_gui();
 
 	if(recAndRep.getBRecord()){
+		for (int j = 0; j <= 6; j++){
+			if (g_kinectGrabber.headZValues[j] != defaultJointValue){
+				switch(noFacesStored){
+					case 0:
+						faceOneID = j;
+						faceOneX = g_kinectGrabber.headXValues[j];
+						faceOneY = g_kinectGrabber.headYValues[j];
+						faceOneZ = g_kinectGrabber.headZValues[j];
+					case 1:
+						faceTwoID = j;
+						faceTwoX = g_kinectGrabber.headXValues[j];
+						faceTwoY = g_kinectGrabber.headYValues[j];
+						faceTwoZ = g_kinectGrabber.headZValues[j];
+					default:
+						break;
+				}
+				noFacesStored++;
+			}
+		}
+		noFacesStored = 0;//resets the number of faces stored
+		if (faceTwoID != -1){
+			printf("hello");
+		}
+		if (faceOneID != -1){
+			printf("hello");
+		}
+		//Note, if faceTwo is unfilled, it will just stay the default
 		recAndRep.storeFrame(colorAlphaPixels, grayPixels, rawTime, headPositionX, headPositionY, headPositionZ, leftShoulderX, leftShoulderY, rightShoulderX,
-							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, depthBuff, closestID);
+							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, faceOneID, faceOneX, faceOneY, faceOneZ, faceTwoID, faceTwoX, faceTwoY, faceTwoZ, depthBuff, blurPixels, closestID);
+		faceOneID = -1;
+		faceOneX = defaultJointValue;
+		faceOneY = defaultJointValue;
+		faceOneZ = defaultJointValue;
+		faceTwoID = -1;
+		faceTwoX = defaultJointValue;
+		faceTwoY = defaultJointValue;
+		faceTwoZ = defaultJointValue;
 	}
 }
 
@@ -185,7 +240,12 @@ void testApp::draw(){
 	//draw another blured layer on top, with alpha(skeleton)=0;
 	blur.setBlurParams(4,(float)blurParam/100);
 	blur.beginRender();
-	if (!recAndRep.getBPlayback() || recAndRep.getBlurOn()){//blur if either not playback or if not blurOn
+	if (recAndRep.getBPlayback()){
+		if(recAndRep.getBlurOn()){
+			texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
+		}
+	}
+	else{
 		texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
 	}
 	blur.endRender();
@@ -243,7 +303,7 @@ void testApp::draw(){
 		}
 		recAndRep.drawSmallButtons();
 	}
-	ofCircle( g_kinectGrabber.headXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.headYValues[closestID]*SCALE+105,10);	
+	ofCircle( g_kinectGrabber.headXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.headYValues[closestID]*SCALE+105,10);
 	//draw skeleton
 	/*
 	ofCircle(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,10);
@@ -409,6 +469,9 @@ void testApp::mousePressed(int x, int y, int button){
 	else if (recAndRep.getRecordButtonPressed(x,y)){
 		recAndRep.standardRecord();
 	}
+	else if (recAndRep.getBPlayback() && clickedOnVideo(x,y)){
+		recAndRep.skipToFaceAt(x,y);
+	}
 	else if (recAndRep.getGoodIdeaButtonPressed(x,y)){
 		recAndRep.setSmallButtonActive(7);
 	}
@@ -432,24 +495,12 @@ void testApp::mousePressed(int x, int y, int button){
 	}
 	else if (recAndRep.getTimerSliderPressed(x,y).first){
 		if (recAndRep.getBPlayback()){
-			if (!recAndRep.getPaused()){
-				recAndRep.skipTo(recAndRep.getTimerSliderPressed(x,y).second);
-			}
-			else{
-				recAndRep.play();//Note: if program is paused b/n this and the pause that skip to does, then the buttons will be incorrect (it will look like it's paused while it's not)
-				recAndRep.skipTo(recAndRep.getTimerSliderPressed(x,y).second);
-			}
+			recAndRep.skipTo(recAndRep.getTimerSliderPressed(x,y).second);
 		}
 	}
 	else if (recAndRep.getSecondSliderPressed(x,y).first){
 		if (recAndRep.getBPlayback()){
-			if (!recAndRep.getPaused()){
-				recAndRep.skipTo(recAndRep.getSecondSliderPressed(x,y).second);
-			}
-			else{
-				recAndRep.play();
-				recAndRep.skipTo(recAndRep.getSecondSliderPressed(x,y).second);
-			}
+			recAndRep.skipTo(recAndRep.getSecondSliderPressed(x,y).second);
 		}
 	}
 }
@@ -464,6 +515,17 @@ void testApp::windowResized(int w, int h){
 
 }
 
+bool testApp::clickedOnVideo(int x, int y){
+	videoStartX = 0+533;
+	videoStartY = 0+105;
+	vWidth = RENDER_WIDTH*scaleParam;
+	vHeight = RENDER_HEIGHT*scaleParam;
+	if((x>=videoStartX && x<videoStartX+vWidth) && (y>=videoStartY && y<videoStartY+vHeight)){
+		return true;
+	}else{
+		return false;
+	}
+}
 //-------------------------------------------------------------- subfunctions used in setup and update functions
 //--------------------------------------------------------------
 void testApp::setup_bg(){

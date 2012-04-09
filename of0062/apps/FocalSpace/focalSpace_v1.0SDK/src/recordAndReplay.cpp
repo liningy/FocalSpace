@@ -2,7 +2,6 @@
 #include <algorithm>//I'm not sure if this is necessary
 
 
-
 //--------------------------------------------------------------------
 recordAndReplay::recordAndReplay(){
 	myTags.init();
@@ -40,8 +39,8 @@ void recordAndReplay::init(){
 	replayButtonActive = true;
 	recordButtonActive = true;
 	goodIdeaButtonActive = false;
-	talkingHeadButtonActive=false;
-	smallButtonActive = false;
+	talkingHeadButtonActive = false;
+	setSmallButtonActive(-1);
 	smallGoodImg.loadImage("images\\r_small.png");
 	smallZeroImg.loadImage("images\\zero.png");
 	smallOneImg.loadImage("images\\one.png");
@@ -76,7 +75,7 @@ void recordAndReplay::init(){
 	//it makes it seems as if the buttons are active. A drawback - even if you click on a non-button spot it will skip
 	(*timer).setSliderPosX(timerProgression*timerWidth);
 	rhrIndex = 0;
-	maxNoIndices = 10;
+	maxNoIndices = lenGesArray; //see note for lenGesArray in the .h file
 	pauseAtNextFrame = false;
 
 	nFrames = 0;
@@ -108,11 +107,13 @@ void recordAndReplay::readFrame(){
 	}
 }
 void recordAndReplay::storeFrame(unsigned char* colorAlphaPixels, unsigned char * grayPixels, time_t rawTime, int headPositionX, int headPositionY, int headPositionZ,
-						int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY, USHORT* depthBuff,
+						int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY,
+						int faceOneID, int faceOneX, int faceOneY, int faceOneZ, int faceTwoID, int faceTwoX, int faceTwoY, int faceTwoZ, USHORT* depthBuff, unsigned char* blurPixels,
 						int closID){
 	nFrames++;
 	kinectRecorder.newFrame(colorAlphaPixels, grayPixels, rawTime, headPositionX, headPositionY, headPositionZ, leftShoulderX, leftShoulderY, rightShoulderX,
-							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, depthBuff);
+							rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY, faceOneID, faceOneX, faceOneY, faceOneZ, 
+							faceTwoID, faceTwoX, faceTwoY, faceTwoZ, depthBuff, blurPixels, closID);
 	numRecordedFrames ++;
 	myTags.checkRightHandUp(rightHandPY,headPositionY); //(every call to this increments a pointer - if right hand is raised. So do it only once per frame)
 	if (myTags.getBRightHandUp()){//if there are more kinds of gestures and audio, send all of them together at end (otherwise, order will get mixed up I believe),but not with suggested improvement
@@ -138,7 +139,7 @@ void recordAndReplay::startRecording() {
 	nFrames = 0;
 	//g_kinectGrabber.recordAudioStart();
 	//startRecordTime = ofGetElapsedTimeMillis();
-	
+	return;
 }
 
 
@@ -162,6 +163,7 @@ void recordAndReplay::stopRecording() {
 	kinectRecorder.close();
 	myTags.close();
 	safeResetLiveMode();
+	return;
 }
 
 //void recordAndReplay::startPlayback(KinectGrabber g_kinectGrabber) {
@@ -177,7 +179,7 @@ void recordAndReplay::startPlayback() {
 		standardReplay();
 	}
 	play();
-
+	return;
 
 	//soundfile.loadSound("sounds/out.wav");
 }
@@ -190,7 +192,7 @@ void recordAndReplay::stopPlayback() {
 	safeResetLiveMode();
 
 	//soundfile.stop();
-
+	return;
 }
 
 //PLAYBACK HELPER FUNCTIONS
@@ -204,7 +206,7 @@ void recordAndReplay::safeResetReplayMode(){//intended to work if you're already
 		goodIdeaButtonActive = true;
 		talkingHeadButtonActive=true;
 		pauseButtonOn = true;
-		smallButtonActive = 7;
+		setSmallButtonActive(7);
 		zeroButtonActive = true;
 		oneButtonActive = true;
 		twoButtonActive = true;
@@ -228,7 +230,7 @@ void recordAndReplay::safeResetLiveMode(){//intended to wrok if you're already i
 	goodIdeaButtonActive = false;
 	talkingHeadButtonActive=false;
 	pauseButtonOn = false;
-	smallButtonActive = -1;
+	setSmallButtonActive(-1);
 	zeroButtonActive = true;
 	oneButtonActive = true;
 	twoButtonActive = true;
@@ -252,17 +254,75 @@ void recordAndReplay::getPlaybackRange(){
 }
 
 void recordAndReplay::skipTo(float percentOfSlider){//it only works while you are playing (not pausing)
+	//Note: if StandardReplay is used, if program is paused b/n this and the pause that skip to does,
+	//then the buttons will be incorrect (it will look like it's paused while it's not)
+	if (getPaused()){
+		play();
+	}
 	currFrame = (int) (percentOfSlider*nFrames); // I know it skips, and i think it readjusts the slider, i'm not exactly sure if the slider is still accurate though.
 	kinectPlayer.seek(currFrame);
 	pauseAtNextFrame = true;
 }
 
+void recordAndReplay::skipToFaceAt(int x, int y){
+	//TODO: store skeletons as arrays of arrays
+	if (getFaceOneX() == -1000){
+		skipToNextFaceID(-1, true);
+		return;
+	}
+	xOneDiff = abs((double)(getFaceOneX() - x));
+	yOneDiff = abs((double)(getFaceOneY() - y));
+	xTwoDiff = abs((double)(getFaceTwoX() - x));
+	yTwoDiff = abs((double)(getFaceTwoY() - y));
+	xOneSquared = pow(xOneDiff,2);
+	yOneSquared = pow(yOneDiff,2); 
+	xTwoSquared = pow(xTwoDiff,2);
+	yTwoSquared = pow(yTwoDiff,2);
+	minRadius = sqrt(xOneSquared + yOneSquared);
+	if ((sqrt(xTwoSquared + yTwoSquared)) < minRadius){
+		skipToNextFaceID(getFaceTwoID(), true);
+	}
+	else{
+		skipToNextFaceID(getFaceOneID(), true);
+	}
+	minRadius = 0.0;
+}
+void recordAndReplay::skipToNextFaceID(int faceID, int wrapAround){
+	//Note: If there is only one frame shift and you click on it, this function will bring you to the start of the current ID period
+	if (faceID == -1){
+		blurOn = true; //b/c the set small... func would set it to true
+		ofRectangle(60,VIDEO_HEIGHT - 20,40,40);
+		//skipTo(((float)currFrame)/nFrames);
+		return;
+	}
+	for (int i=0;i<maxNoIndices;i++){
+		if (myTags.getTagInfo(2,faceID,i)> currFrame){
+			setSmallButtonActive(faceID);
+			skipTo(((float)myTags.getTagInfo(2,faceID,i))/nFrames);
+			return;
+		}
+	}
+	if (wrapAround){
+		setSmallButtonActive(faceID);
+		skipTo(((float)myTags.getTagInfo(2,faceID,0))/nFrames);
+		return;
+	}
+	//If you can find a frame with the given ID (after you, with wrapAround = false, 
+	//or anywhere with wrapAround = true) return the currentFrame, and TODO: Possibly display text (for now I draw a square)?
+	//(it probably shouldn't come here unless something is wrong)
+	blurOn = true; //b/c the set small... func would set it to true
+	ofRectangle(60,VIDEO_HEIGHT - 20,40,40);
+	//skipTo(((float)currFrame)/nFrames);
+	return;
+}
 /////BUTTON CONTROL SECTION
 
 void recordAndReplay::setSmallButtonActive(int newValue){
 	smallButtonActive = newValue;
-	if (smallButtonActive == 6){blurOn == false;}
-	else if (smallButtonActive >= 0 && smallButtonActive <= 5){blurOn == false;}
+	if (smallButtonActive == 6){blurOn = false;}
+	else if (smallButtonActive == -1){blurOn = false;}
+	else if (smallButtonActive >= 0 && smallButtonActive <= 5){blurOn = true;}
+	else {blurOn = false;}
 }
 void recordAndReplay::standardStop(){
 		if (bRecord){
@@ -273,7 +333,7 @@ void recordAndReplay::standardStop(){
 			goodIdeaButtonActive = false;
 			talkingHeadButtonActive=false;
 			pauseButtonOn = false;
-			smallButtonActive = -1;
+			setSmallButtonActive(-1);
 			zeroButtonActive = true;
 			oneButtonActive = true;
 			twoButtonActive = true;
@@ -289,7 +349,7 @@ void recordAndReplay::standardStop(){
 			goodIdeaButtonActive = false;
 			talkingHeadButtonActive=false;
 			pauseButtonOn = false;
-			smallButtonActive = -1;
+			setSmallButtonActive(-1);
 			zeroButtonActive = true;
 			oneButtonActive = true;
 			twoButtonActive = true;
@@ -309,7 +369,7 @@ void recordAndReplay::standardReplay(){
 			goodIdeaButtonActive = true;
 			talkingHeadButtonActive=true;
 			pauseButtonOn = true; //note, this indicates whether the paues button is displayed or not
-			smallButtonActive = 7;
+			setSmallButtonActive(7);
 			zeroButtonActive = true;
 			oneButtonActive = true;
 			twoButtonActive = true;
@@ -343,7 +403,7 @@ void recordAndReplay::standardRecord(){
 		recordButtonActive = false;
 		goodIdeaButtonActive = false;
 		talkingHeadButtonActive=false;
-		smallButtonActive = -1;
+		setSmallButtonActive(-1);
 		zeroButtonActive = true;
 		oneButtonActive = true;
 		twoButtonActive = true;

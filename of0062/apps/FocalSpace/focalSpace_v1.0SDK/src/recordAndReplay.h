@@ -30,7 +30,8 @@ public:
 	/// interface with testApp
 	void readFrame(); //(sets the variables testApp is going to read - is called during playback)
 	void storeFrame(unsigned char* colorAlphaPixels, unsigned char * grayPixels, time_t rawTime, int headPositionX, int headPositionY, int headPositionZ,
-					int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY, USHORT* depthBuff,
+					int leftShoulderX, int leftShoulderY, int rightShoulderX, int rightShoulderY, int leftHandPX, int leftHandPY, int rightHandPX, int rightHandPY,
+					int faceOneID, int faceOneX, int faceOneY, int faceOneZ, int faceTwoID, int faceTwoX, int faceTwoY, int faceTwoZ, USHORT* depthBuff, unsigned char* blurPixels,
 					int closID);
 	void drawButtons();
 	void drawSmallButtons();
@@ -42,7 +43,8 @@ public:
 	void safeResetLiveMode(); //resets variables (gui and backend) that may have changed (resets live video mode)
 	void getPlaybackRange(); //gets the playback range for the purposes of displaying a slider
 	void skipTo(float percentOfSlider);//takes in a percent value of the slider progress, converts it to a percent value of the number of frames, then forwards until it gets there and pauses.
-	
+	void skipToFaceAt(int x, int y); //takes in coordinates, finds the closest face and runs skipToNextFaceID on it.
+	void skipToNextFaceID(int faceID, int wrapAround); //accepts a face ID, and skips to the next time that face shows up. if the third value is true, it will wrap around (the playback bar)
 	void pause() {paused = true;} //allows live and recorded video to be paused
 	void play()  {paused = false;} //sets paused = false (undos the pause effect stated above)
 
@@ -90,19 +92,29 @@ public:
 	//ofSoundPlayer getSoundfile() {return soundfile;};
 	unsigned char * getColorAlphaPixels() {return rgbdepthpair.first;};
 	unsigned char * getGrayPixels() {return rgbdepthpair.second.first;};
-	time_t getRawTime() {return rgbdepthpair.second.second.first;};
-	int getHeadPositionX() {return rgbdepthpair.second.second.second.first;}
-	int getHeadPositionY() {return rgbdepthpair.second.second.second.second.first;};
-	int getHeadPositionZ() {return rgbdepthpair.second.second.second.second.second.first;};
-	int getLeftShoulderX() {return rgbdepthpair.second.second.second.second.second.second.first;};
-	int getLeftShoulderY() {return rgbdepthpair.second.second.second.second.second.second.second.first;};
-	int getRightShoulderX()  {return rgbdepthpair.second.second.second.second.second.second.second.second.first;};
-	int getRightShoulderY() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.first;};
-	int getLeftHandPX() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.first;};
-	int getLeftHandPY() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.first;};
-	int getRightHandPX() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.first;};
-	int getRightHandPY() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
-	USHORT* getDepthBuff() {return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second;};
+	time_t getRawTime()				{return rgbdepthpair.second.second.first;};
+	int getHeadPositionX()			{return rgbdepthpair.second.second.second.first;}
+	int getHeadPositionY()			{return rgbdepthpair.second.second.second.second.first;};
+	int getHeadPositionZ()			{return rgbdepthpair.second.second.second.second.second.first;};
+	int getLeftShoulderX()			{return rgbdepthpair.second.second.second.second.second.second.first;};
+	int getLeftShoulderY()			{return rgbdepthpair.second.second.second.second.second.second.second.first;};
+	int getRightShoulderX()			{return rgbdepthpair.second.second.second.second.second.second.second.second.first;};
+	int getRightShoulderY()			{return rgbdepthpair.second.second.second.second.second.second.second.second.second.first;};
+	int getLeftHandPX()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.first;};
+	int getLeftHandPY()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getRightHandPX()			{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getRightHandPY()			{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceOneID()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceOneX()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceOneY()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceOneZ()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceTwoID()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceTwoX()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceTwoY()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getFaceTwoZ()				{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	USHORT* getDepthBuff()			{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	unsigned char * getBlurPixels()	{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.first;};
+	int getClosID()					{return rgbdepthpair.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second.second;};
 
 	pair<bool,float> getSecondSliderPressed(int x,int y) {return (*secondSlider).sliderPressed(x,y);};
 	pair<bool,float> getTimerSliderPressed(int x,int y) {return (*timer).sliderPressed(x,y);};
@@ -162,7 +174,8 @@ private:
 	bool fiveButtonActive;
 
 	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
-		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> rgbdepthpair;//variable that accepts the variables that kinectPlayer sends
+		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,
+		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<USHORT*,pair<unsigned char *,int>>>>>>>>>>>>>>>>>>>>>>>> rgbdepthpair;//variable that accepts the variables that kinectPlayer sends
 
 	pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int, pair<int,
 		pair<int, int>>>>>>>>>> frameInfo;//variable that accepts the variables that kinectPlayerInfo sends (nFrames and gesture audio indices)
@@ -202,10 +215,14 @@ private:
 	ofImage tempSmallImg; 
 	int tempButtonX;
 	int rhrIndex; //the index of the index after the last currently  filled slot in the small RHRLocations array
-	int maxNoIndices; //the max of each kind of gesture of audio allowable
+	int maxNoIndices;
 	int currNum; //holder for frame no recovered from tagInfo
 	int gen; //genCat for button (TODO: in future can implement buttons as arrays of buttons)
 	int spec; //specCat for button
+	static const int lenGesArray = 10;  //the max of each kind of gesture of audio allowable (this variable should be the same as the one with the same name in tags)
+
+	double xOneSquared, yOneSquared, xTwoSquared, yTwoSquared; //helps with skipToNextFaceID
+	double xOneDiff, yOneDiff, xTwoDiff, yTwoDiff;
 	/////Sliders
 	slider* timer;
 	slider* secondSlider; //(right below first and with similar parameters). Use: To be able to click on gesture symols and stuff
@@ -218,6 +235,8 @@ private:
 	int timerHeight; //replay timer height
 	float timerProgression; //the fraction (currFrame/nFrames)
 	bool bRightHandUp;
+
+	double minRadius; //helps in skipToFaceAt
 };
 
 #endif

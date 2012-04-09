@@ -20,7 +20,10 @@ public:
 	/// set video to true to enable the video (infrared/RGB) image
 	/// make sure you recorded the video frames or reading them will fail big time!
 	void setup(const string & file, const string & fileInt, bool video=false);
-	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> updatea();
+	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
+			pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int, pair<int,
+			pair<int,pair<int,pair<int,pair<int,pair<int,pair<int, pair<USHORT*, pair<unsigned char *,int>>>>>>>>>>>>>>>>>>>>>>>> updatea();
+
 	pair<int, pair<int, int>> updateSideInfo();
 	bool checkEndOfSideFile() {return std::feof(fInt);};
 	void seek(int frameNo);
@@ -81,6 +84,7 @@ private:
 	bool bUseTexture;
 	unsigned char *rgb;
 	USHORT* depthbuff;
+	unsigned char *blurPixels;
 	ofPixels pixels;
 
 	bool bVideo;
@@ -89,6 +93,9 @@ private:
 	int lastFrameTime;
 	int headx, heady, headz;
 	int leftshoulderx, leftshouldery, rightshoulderx, rightshouldery, lefthandx, lefthandy, righthandx, righthandy;
+
+	int faceOneID,faceOneX, faceOneY, faceOneZ, faceTwoID, faceTwoX, faceTwoY, faceTwoZ; //stores information about the two faces to be stored that have (preferrably) a non -1000 value
+	int closID; //keeps track of the closestID;
 	bool righthandraised;
 	time_t rawTime;
 

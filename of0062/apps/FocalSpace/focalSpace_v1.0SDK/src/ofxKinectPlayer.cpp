@@ -20,6 +20,7 @@ ofxKinectPlayer::ofxKinectPlayer(){
 	buf = 0;
 	rgb = 0;
 	depthbuff = 0;
+	blurPixels = 0;
 	bUseTexture = true;
 	fps = 30;//default is 30. it can be set again in updateSideInfo with some more code if desired
 	//fpsOffset = 8.2;
@@ -32,6 +33,7 @@ ofxKinectPlayer::~ofxKinectPlayer() {
 	if(buf) delete[] buf;
 	if(rgb) delete[] rgb;
 	if(depthbuff) delete[] depthbuff;
+	if(blurPixels) delete[] blurPixels;
 
 	//calibration.clear();
 	depthTex.clear();
@@ -49,12 +51,16 @@ void ofxKinectPlayer::setup(const string & file, const string & fileInt, bool vi
 	filename = file;
 	fInt = fopen(ofToDataPath(fileInt).c_str(), "rb");
 	filenameInt = fileInt;
-	size = 2*(640*480*4)+11*sizeof(int)+sizeof(time_t)+ (640*480*2);      //Note, edit this everytime you change the size of a frame to be recorded!!
+
+	size = 2*(640*480*4)+20*sizeof(int)+sizeof(time_t)+ (640*480*2) + (640*480*4);      //Note, edit this everytime you change the size of a frame to be recorded!!
+	
 	//if(!buf) buf 		= new uint16_t[640*480];
 	if(!buf) buf = new unsigned char[640*480*4];
 	if(!rgb) rgb = new unsigned char[640*480*4];
 	memset(rgb,255,640*480*4);
-	if(!depthbuff) depthbuff = new USHORT[640*480*4];
+	if(!depthbuff) depthbuff = new USHORT[640*480*2];//was 640*480*4
+	memset(depthbuff,255,640*480*4);
+	if(!blurPixels) blurPixels = new unsigned char[640*480*4];
 	memset(depthbuff,255,640*480*4);
 	//pixels.setFromExternalPixels(rgb, 640, 480, OF_IMAGE_COLOR);
 	if(!depthTex.bAllocated() && bUseTexture)
@@ -69,7 +75,9 @@ void ofxKinectPlayer::setup(const string & file, const string & fileInt, bool vi
 //-----------------------------------------------------------
 void ofxKinectPlayer::update(){
 }
-pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,USHORT*>>>>>>>>>>>>>> ofxKinectPlayer::updatea(){
+pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
+			pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int, pair<int,
+			pair<int,pair<int,pair<int,pair<int,pair<int,pair<int, pair<USHORT*, pair<unsigned char *,int>>>>>>>>>>>>>>>>>>>>>>>> ofxKinectPlayer::updatea(){
 	if(!f){
 		printf("error!");
 	}
@@ -92,7 +100,20 @@ pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int
 	fread(&lefthandy,sizeof(int),1,f);
 	fread(&righthandx,sizeof(int),1,f);
 	fread(&righthandy,sizeof(int),1,f);
+
+	fread(&faceOneID,sizeof(int),1,f);
+	fread(&faceOneX,sizeof(int),1,f);
+	fread(&faceOneY,sizeof(int),1,f);
+	fread(&faceOneZ,sizeof(int),1,f);
+	fread(&faceTwoID,sizeof(int),1,f);
+	fread(&faceTwoX,sizeof(int),1,f);
+	fread(&faceTwoY,sizeof(int),1,f);
+	fread(&faceTwoZ,sizeof(int),1,f);
+
 	fread(depthbuff,640*480*2,1,f);
+	fread(blurPixels,640*480*4,1,f);
+
+	fread(&closID,sizeof(int),1,f);
 	// loop?
 	if(bLoop && std::feof(f) > 0) {
 		f = fopen(ofToDataPath(filename).c_str(), "rb");
@@ -102,10 +123,16 @@ pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int
 	if(bUseTexture){
 		//depthTex.loadData(calibration.getDepthPixels(),640,480,GL_LUMINANCE);
 		//videoTex.loadData(rgb,640,480,GL_RGB);
-	  return make_pair(rgb,make_pair(buf,make_pair(rawTime,make_pair(headx,make_pair(heady,make_pair(headz,make_pair(leftshoulderx,make_pair(leftshouldery,make_pair(rightshoulderx,make_pair(rightshouldery,make_pair(lefthandx,make_pair(lefthandy,make_pair(righthandx,make_pair(righthandy,depthbuff))))))))))))));
+	  return make_pair(rgb,make_pair(buf,make_pair(rawTime,make_pair(headx,make_pair(heady,make_pair(headz,make_pair(leftshoulderx,
+		  make_pair(leftshouldery,make_pair(rightshoulderx,make_pair(rightshouldery,make_pair(lefthandx,make_pair(lefthandy,make_pair(righthandx,make_pair(righthandy,
+		  make_pair(faceOneID,make_pair(faceOneX,make_pair(faceOneY,make_pair(faceOneZ,make_pair(faceTwoID,make_pair(faceTwoX,make_pair(faceTwoY,make_pair(faceTwoZ,
+		  make_pair(depthbuff, make_pair(blurPixels, closID))))))))))))))))))))))));
 	}
 	printf("error!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	return make_pair(rgb,make_pair(buf,make_pair(rawTime,make_pair(headx,make_pair(heady,make_pair(headz,make_pair(leftshoulderx,make_pair(leftshouldery,make_pair(rightshoulderx,make_pair(rightshouldery,make_pair(lefthandx,make_pair(lefthandy,make_pair(righthandx,make_pair(righthandy,depthbuff))))))))))))));
+	return make_pair(rgb,make_pair(buf,make_pair(rawTime,make_pair(headx,make_pair(heady,make_pair(headz,make_pair(leftshoulderx,
+	make_pair(leftshouldery,make_pair(rightshoulderx,make_pair(rightshouldery,make_pair(lefthandx,make_pair(lefthandy,make_pair(righthandx,make_pair(righthandy,
+	make_pair(faceOneID,make_pair(faceOneX,make_pair(faceOneY,make_pair(faceOneZ,make_pair(faceTwoID,make_pair(faceTwoX,make_pair(faceTwoY,make_pair(faceTwoZ,
+	make_pair(depthbuff, make_pair(blurPixels, closID))))))))))))))))))))))));
 }
 
 //-----------------------------------------------------------

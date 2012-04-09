@@ -14,7 +14,11 @@ public:
 	ofxKinectRecorder();
 	virtual ~ofxKinectRecorder();
 	void init(const string & filename, const string & filenameInt);
-    void newFrame(unsigned char* rgb = NULL, unsigned char * raw_depth = NULL, time_t = NULL, int headx = NULL, int heady = NULL, int headz = NULL, int leftshoulderx = NULL, int leftshouldery = NULL, int rightshoulderx = NULL, int rightshouldery = NULL, int lefthandx = NULL, int lefthandy = NULL, int righthandx = NULL, int righthandy = NULL, USHORT* depthbuff = NULL);
+    void newFrame(unsigned char* rgb = NULL, unsigned char * raw_depth = NULL, time_t = NULL, int headx = NULL, int heady = NULL, int headz = NULL, 
+					int leftshoulderx = NULL, int leftshouldery = NULL, int rightshoulderx = NULL, int rightshouldery = NULL, int lefthandx = NULL, 
+					int lefthandy = NULL, int righthandx = NULL, int righthandy = NULL, int faceOneID = NULL, int faceOneX = NULL, int faceOneY = NULL, 
+					int faceOneZ = NULL, int faceTwoID = NULL, int faceTwoX = NULL, int faceTwoY = NULL, int faceTwoZ = NULL, USHORT* depthbuff = NULL, 
+					unsigned char* blurPixels = NULL, int closID = NULL);
 	void storeSideInfo(int genCat = NULL, int specCat = NULL, int frameNo = NULL);//keeps track of gestures and stuff
 	/*
 	Guide:

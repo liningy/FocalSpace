@@ -46,6 +46,8 @@ class testApp : public ofBaseApp{
 		void mouseReleased(int x, int y, int button);
 		void windowResized(int w, int h);
 
+		bool clickedOnVideo(int x, int y);
+
 		/////Gesture Checks
 		bool rightHandRaised(); //checks whether the right hand of the skeleton we are tracking is currently raised (returns true if it is)
 
@@ -73,6 +75,15 @@ class testApp : public ofBaseApp{
 
 		int headPositionX, headPositionY, headPositionZ;
 		int neckPositionX, neckPositionY, leftShoulderX, leftShoulderY, rightShoulderX, rightShoulderY,leftHandPX, leftHandPY, rightHandPX, rightHandPY;
+		int faceOneID,faceOneX, faceOneY, faceOneZ, faceTwoID, faceTwoX, faceTwoY, faceTwoZ; //stores information about the two faces to be stored that have (preferrably) a non -1000 value
+		static const int defaultJointValue = -1000;
+		int noFacesStored; //keeps track of how many faces have been stored so far (when recording, it tries to store non -1000 values first)
+
+		float videoStartX;
+		float videoStartY;
+		float vWidth;
+		float vHeight;
+
 		bool peopleSelectedbyMouse;
 		
 		shaderBlur      blur;
@@ -132,6 +143,7 @@ class testApp : public ofBaseApp{
 
 		//for record and replay
 		recordAndReplay	recAndRep;
+
 		/////Time
 		time_t rawTime; //current time
 		struct tm * timeinfo; //intermediate step in printing rawTime as a calendar date
