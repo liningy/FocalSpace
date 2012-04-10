@@ -113,13 +113,13 @@ HRESULT KinectGrabber::Kinect_Init() {
 	InitializeCriticalSection (&cs);
 	writeTurn = true;
 	HRESULT hr,hr_init_0,hr0,hr_rgb_0;
-	hr_init_0 = NuiCreateSensorByIndex(0, &m_pNuiSensor);
+	hr_init_0 = NuiCreateSensorByIndex(1, &m_pNuiSensor);
 	m_instanceId = m_pNuiSensor->NuiDeviceConnectionId();
 
 
 	if ( !m_pNuiSensor )
     {
-        hr_init_0 = NuiCreateSensorByIndex(0, &m_pNuiSensor);
+        hr_init_0 = NuiCreateSensorByIndex(1, &m_pNuiSensor);
 
         if ( FAILED(hr) )
         {
@@ -699,8 +699,9 @@ void KinectGrabber::getJointsPoints() {
 void KinectGrabber::recordAudioInit() {
 	minDiscrepancyIdx=7;  //when skeleton is detected, the number should be between 0 to 6. Set it to a random number beyond this range is OK
 	HRESULT hr = S_OK;
-	int  iMicDevIdx = -1; 
-	int  iSpkDevIdx = 0;  //Asume default speakers
+	int  iMicDevIdx = -1;
+
+	int  iSpkDevIdx = 0; //Asume default speakers
 	pDMO = NULL;  
     pPS = NULL;
     HANDLE mmHandle = NULL;

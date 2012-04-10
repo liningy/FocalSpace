@@ -396,6 +396,7 @@ void testApp::draw(){
 		recAndRep.drawSmallButtons();
 	}
 	//draw skeleton
+	/*
 	ofCircle(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,10);
 	ofCircle(leftShoulderX*SCALE+RENDER_WIDTH, leftShoulderY*SCALE+105,10);
 	ofCircle(rightShoulderX*SCALE+RENDER_WIDTH,rightShoulderY*SCALE+105,10); 
@@ -405,6 +406,7 @@ void testApp::draw(){
 	ofLine(leftShoulderX*SCALE+RENDER_WIDTH, leftShoulderY*SCALE+105,leftHandPX*SCALE+RENDER_WIDTH,leftHandPY*SCALE+105);
 	ofLine(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,rightShoulderX*SCALE+RENDER_WIDTH,rightShoulderY*SCALE+105);
 	ofLine(rightShoulderX*SCALE+RENDER_WIDTH,rightShoulderY*SCALE+105,rightHandPX*SCALE+RENDER_WIDTH,rightHandPY*SCALE+105);
+	*/
 	//ofDrawBitmapString (asctime (timeinfo), 1.5*VIDEO_WIDTH + 50, 1.5*VIDEO_HEIGHT + 50);
 	//sketch viewer
 	if(!sketchShareView.close){
