@@ -113,13 +113,14 @@ HRESULT KinectGrabber::Kinect_Init() {
 	InitializeCriticalSection (&cs);
 	writeTurn = true;
 	HRESULT hr,hr_init_0,hr0,hr_rgb_0;
-	hr_init_0 = NuiCreateSensorByIndex(0, &m_pNuiSensor);
+	kinectIndex = 1;
+	hr_init_0 = NuiCreateSensorByIndex(kinectIndex, &m_pNuiSensor);
 	m_instanceId = m_pNuiSensor->NuiDeviceConnectionId();
 
 
 	if ( !m_pNuiSensor )
     {
-        hr_init_0 = NuiCreateSensorByIndex(0, &m_pNuiSensor);
+        hr_init_0 = NuiCreateSensorByIndex(kinectIndex, &m_pNuiSensor);
 
         if ( FAILED(hr) )
         {
@@ -236,6 +237,9 @@ HRESULT KinectGrabber::Kinect_Init() {
     //CHECKHR(pDMO->QueryInterface(IID_IPropertyStore, (void**)&pPS));
 	printf("..............");
 	INuiAudioBeam* pAudio = NULL;
+	if(kinectIndex != 0) {	
+		CHECKHR(NuiInitialize(NUI_INITIALIZE_FLAG_USES_AUDIO));
+	}
     CHECKHR(NuiGetAudioSource(&pAudio));
     CHECKHR(pAudio->QueryInterface(IID_IMediaObject, (void**)&pDMO));
     CHECKHR(pAudio->QueryInterface(IID_IPropertyStore, (void**)&pPS));
@@ -266,7 +270,11 @@ HRESULT KinectGrabber::Kinect_Init() {
     // Default rendering device (speaker) will be used.
     hr = GetMicArrayDeviceIndex(&iMicDevIdx);
     CHECK_RET(hr, "Failed to find microphone array device. Make sure microphone array is properly installed.");
-   
+   */
+	if(kinectIndex ==2)
+		iMicDevIdx = 1;//kinectIndex;
+		if(kinectIndex ==1)
+		iMicDevIdx = 2;
     PROPVARIANT pvDeviceId;
     PropVariantInit(&pvDeviceId);
     pvDeviceId.vt = VT_I4;
@@ -274,7 +282,7 @@ HRESULT KinectGrabber::Kinect_Init() {
     pvDeviceId.lVal = (unsigned long)(iSpkDevIdx<<16) | (unsigned long)(0x0000ffff & iMicDevIdx);
     CHECKHR(pPS->SetValue(MFPKEY_WMAAECMA_DEVICE_INDEXES, pvDeviceId));
     PropVariantClear(&pvDeviceId);
-	*/
+	
 
 	////////////////////////// audio init///////////////////////////////////////
 	

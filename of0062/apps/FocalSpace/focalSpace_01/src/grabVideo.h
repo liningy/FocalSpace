@@ -86,7 +86,7 @@ public:
 	bool                      writeTurn;
 	DWORD                     m_SkeletonIds[NUI_SKELETON_COUNT];
 	DWORD                     m_TrackedSkeletonIds[NUI_SKELETON_MAX_TRACKED_COUNT];
-
+	int		kinectIndex;
 
 	//---------------------------------------------------------------------/
 	// Sensor Initialization and Update

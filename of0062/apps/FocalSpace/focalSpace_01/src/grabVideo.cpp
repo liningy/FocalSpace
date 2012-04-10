@@ -113,13 +113,13 @@ HRESULT KinectGrabber::Kinect_Init() {
 	InitializeCriticalSection (&cs);
 	writeTurn = true;
 	HRESULT hr,hr_init_0,hr0,hr_rgb_0;
-	hr_init_0 = NuiCreateSensorByIndex(0, &m_pNuiSensor);
+	kinectIndex = 1;
+	hr_init_0 = NuiCreateSensorByIndex(kinectIndex, &m_pNuiSensor);
 	m_instanceId = m_pNuiSensor->NuiDeviceConnectionId();
-
 
 	if ( !m_pNuiSensor )
     {
-        hr_init_0 = NuiCreateSensorByIndex(0, &m_pNuiSensor);
+        hr_init_0 = NuiCreateSensorByIndex(kinectIndex, &m_pNuiSensor);
 
         if ( FAILED(hr) )
         {
@@ -236,6 +236,9 @@ HRESULT KinectGrabber::Kinect_Init() {
     //CHECKHR(pDMO->QueryInterface(IID_IPropertyStore, (void**)&pPS));
 	printf("..............");
 	INuiAudioBeam* pAudio = NULL;
+	if(kinectIndex != 0) {
+		NuiInitialize(NUI_INITIALIZE_FLAG_USES_AUDIO);
+	}
     CHECKHR(NuiGetAudioSource(&pAudio));
     CHECKHR(pAudio->QueryInterface(IID_IMediaObject, (void**)&pDMO));
     CHECKHR(pAudio->QueryInterface(IID_IPropertyStore, (void**)&pPS));
@@ -261,12 +264,12 @@ HRESULT KinectGrabber::Kinect_Init() {
         _tprintf(_T("Device will be ready for recording in %d second(s).\r"), dwWait--);
         Sleep(1000);
     }
-	/*
+	
 	// Tell DMO which capture device to use (we're using whichever device is a microphone array).
     // Default rendering device (speaker) will be used.
-    hr = GetMicArrayDeviceIndex(&iMicDevIdx);
-    CHECK_RET(hr, "Failed to find microphone array device. Make sure microphone array is properly installed.");
-   
+    //hr = GetMicArrayDeviceIndex(&iMicDevIdx);
+    //CHECK_RET(hr, "Failed to find microphone array device. Make sure microphone array is properly installed.");
+    iMicDevIdx = kinectIndex;
     PROPVARIANT pvDeviceId;
     PropVariantInit(&pvDeviceId);
     pvDeviceId.vt = VT_I4;
@@ -274,13 +277,13 @@ HRESULT KinectGrabber::Kinect_Init() {
     pvDeviceId.lVal = (unsigned long)(iSpkDevIdx<<16) | (unsigned long)(0x0000ffff & iMicDevIdx);
     CHECKHR(pPS->SetValue(MFPKEY_WMAAECMA_DEVICE_INDEXES, pvDeviceId));
     PropVariantClear(&pvDeviceId);
-	*/
+	
 
 	////////////////////////// audio init///////////////////////////////////////
 	
 
-	m_hThNuiProcess = CreateThread( NULL, 0, Kinect_Update, this, 0, NULL );
-	m_hEvNuiProcessStop = CreateEvent( NULL, FALSE, FALSE, NULL );
+	//m_hThNuiProcess = CreateThread( NULL, 0, Kinect_Update, this, 0, NULL );
+	//m_hEvNuiProcessStop = CreateEvent( NULL, FALSE, FALSE, NULL );
 
     //puts("done with initializing kinect sensor, press any key to continue...");
     //_getch();

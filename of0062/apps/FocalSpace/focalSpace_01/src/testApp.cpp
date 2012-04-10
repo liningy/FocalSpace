@@ -197,7 +197,7 @@ void testApp::update(){
 	//printf(" closest person : %i \n", closestID); 
 	//printf("confirmed selection?: %s",(confirmSelection)?"true":"false");
 	//printf("-------------------------------------------\n"); 
-	printf("skeleton tracked?: %s",	(g_kinectGrabber.isSkeletonTracked)? "true":"false");
+	//printf("skeleton tracked?: %s",	(g_kinectGrabber.isSkeletonTracked)? "true":"false");
 	//printf("-------------------------------------------\n"); 
 
 	

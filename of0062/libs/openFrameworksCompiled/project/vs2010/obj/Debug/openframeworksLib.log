@@ -1,17 +1,17 @@
-﻿Build started 4/9/2012 2:24:45 AM.
-     1>Project "C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" on node 2 (build target(s)).
+﻿Build started 4/10/2012 7:49:23 PM.
+     1>Project "C:\Users\TMG\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "obj\Debug\openframeworksLib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          All outputs are up-to-date.
        Lib:
          All outputs are up-to-date.
-         openframeworksLib.vcxproj -> C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\..\..\lib\vs2010\openframeworksLibDebug.lib
+         openframeworksLib.vcxproj -> C:\Users\TMG\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\..\..\lib\vs2010\openframeworksLibDebug.lib
        FinalizeBuildStatus:
          Deleting file "obj\Debug\openframeworksLib.unsuccessfulbuild".
          Touching "obj\Debug\openframeworksLib.lastbuildstate".
-     1>Done Building Project "C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" (build target(s)).
+     1>Done Building Project "C:\Users\TMG\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.09
+Time Elapsed 00:00:00.03
