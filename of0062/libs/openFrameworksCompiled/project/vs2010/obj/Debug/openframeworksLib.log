@@ -1,17 +1,49 @@
-﻿Build started 4/10/2012 4:26:33 PM.
-     1>Project "C:\Users\TMG\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" on node 2 (build target(s)).
+﻿Build started 4/11/2012 12:06:53 AM.
+     1>Project "C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "obj\Debug\openframeworksLib.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         All outputs are up-to-date.
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\..\..\libs\openFrameworks /I..\..\..\..\libs\openFrameworks\graphics /I..\..\..\..\libs\openFrameworks\app /I..\..\..\..\libs\openFrameworks\sound /I..\..\..\..\libs\openFrameworks\utils /I..\..\..\..\libs\openFrameworks\communication /I..\..\..\..\libs\openFrameworks\video /I..\..\..\..\libs\openFrameworks\events /I..\..\..\..\libs\glut\include /I..\..\..\..\libs\rtAudio\include /I..\..\..\..\libs\quicktime\include /I..\..\..\..\libs\freetype\include /I..\..\..\..\libs\freetype\include\freetype2 /I..\..\..\..\libs\freeImage\include /I..\..\..\..\libs\fmodex\include /I..\..\..\..\libs\videoInput\include /I..\..\..\..\libs\glee\include /I..\..\..\..\libs\glu\include /I..\..\..\..\libs\poco\include /I..\..\..\addons /ZI /nologo /W1 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D POCO_STATIC /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"obj\Debug\\" /Fd"obj\Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\openFrameworks\app\ofAppGlutWindow.cpp ..\..\..\openFrameworks\app\ofAppRunner.cpp ..\..\..\openFrameworks\graphics\ofBitmapFont.cpp ..\..\..\openFrameworks\graphics\ofGraphics.cpp ..\..\..\openFrameworks\graphics\ofImage.cpp ..\..\..\openFrameworks\graphics\ofTexture.cpp ..\..\..\openFrameworks\graphics\ofTrueTypeFont.cpp ..\..\..\openFrameworks\sound\ofSoundPlayer.cpp ..\..\..\openFrameworks\sound\ofSoundStream.cpp ..\..\..\openFrameworks\utils\ofMath.cpp ..\..\..\openFrameworks\utils\ofUtils.cpp ..\..\..\openFrameworks\video\ofQtUtils.cpp ..\..\..\openFrameworks\video\ofVideoGrabber.cpp ..\..\..\openFrameworks\video\ofVideoPlayer.cpp ..\..\..\openFrameworks\communication\ofArduino.cpp ..\..\..\openFrameworks\communication\ofSerial.cpp
+         ofSerial.cpp
+         ofArduino.cpp
+         ofVideoPlayer.cpp
+         ofVideoGrabber.cpp
+         ofQtUtils.cpp
+         ofUtils.cpp
+         ofMath.cpp
+         ofSoundStream.cpp
+         ofSoundPlayer.cpp
+         ofTrueTypeFont.cpp
+         ofTexture.cpp
+         ofImage.cpp
+         ofGraphics.cpp
+         ofBitmapFont.cpp
+         ofAppRunner.cpp
+         ofAppGlutWindow.cpp
+         Generating Code...
        Lib:
-         All outputs are up-to-date.
-         openframeworksLib.vcxproj -> C:\Users\TMG\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\..\..\lib\vs2010\openframeworksLibDebug.lib
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"..\..\lib\vs2010\openframeworksLibDebug.lib" /NOLOGO obj\Debug\ofAppGlutWindow.obj
+         obj\Debug\ofAppRunner.obj
+         obj\Debug\ofBitmapFont.obj
+         obj\Debug\ofGraphics.obj
+         obj\Debug\ofImage.obj
+         obj\Debug\ofTexture.obj
+         obj\Debug\ofTrueTypeFont.obj
+         obj\Debug\ofSoundPlayer.obj
+         obj\Debug\ofSoundStream.obj
+         obj\Debug\ofMath.obj
+         obj\Debug\ofUtils.obj
+         obj\Debug\ofQtUtils.obj
+         obj\Debug\ofVideoGrabber.obj
+         obj\Debug\ofVideoPlayer.obj
+         obj\Debug\ofArduino.obj
+         obj\Debug\ofSerial.obj
+         openframeworksLib.vcxproj -> C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\..\..\lib\vs2010\openframeworksLibDebug.lib
        FinalizeBuildStatus:
          Deleting file "obj\Debug\openframeworksLib.unsuccessfulbuild".
          Touching "obj\Debug\openframeworksLib.lastbuildstate".
-     1>Done Building Project "C:\Users\TMG\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" (build target(s)).
+     1>Done Building Project "C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.03
+Time Elapsed 00:00:31.24
