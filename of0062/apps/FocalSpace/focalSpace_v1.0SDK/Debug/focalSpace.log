@@ -1,14 +1,19 @@
-﻿Build started 4/10/2012 7:49:23 PM.
+﻿Build started 4/10/2012 11:04:29 PM.
      1>Project "C:\Users\TMG\FocalSpace\of0062\apps\FocalSpace\focalSpace_v1.0SDK\focalSpace.vcxproj" on node 3 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\focalSpace.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\..\libs\openFrameworks /I..\..\..\libs\openFrameworks\graphics /I..\..\..\libs\openFrameworks\app /I..\..\..\libs\openFrameworks\sound /I..\..\..\libs\openFrameworks\utils /I..\..\..\libs\openFrameworks\communication /I..\..\..\libs\openFrameworks\video /I..\..\..\libs\openFrameworks\events /I..\..\..\libs\glut\include /I..\..\..\libs\rtAudio\include /I..\..\..\libs\quicktime\include /I..\..\..\libs\freetype\include /I..\..\..\libs\freetype\include\freetype2 /I..\..\..\libs\freeImage\include /I..\..\..\libs\fmodex\include /I..\..\..\libs\videoInput\include /I..\..\..\libs\glee\include /I..\..\..\libs\glu\include /I..\..\..\libs\poco\include /I..\..\..\addons /I..\..\..\addons\ofxNetwork\src /I..\..\..\addons\ofxDirList\src /I..\..\..\addons\ofxObjLoader\src /I..\..\..\addons\ofxOpenCv\src /I..\..\..\addons\ofxOpenCv\libs\opencv\include /I..\..\..\addons\ofxOsc\src /I..\..\..\addons\ofxOsc\libs\oscpack\include\ip /I..\..\..\addons\ofxOsc\libs\oscpack\include\osc /I..\..\..\addons\ofxThread\src /I..\..\..\addons\ofxVectorGraphics\src /I..\..\..\addons\ofxVectorGraphics\libs /I..\..\..\addons\ofxVectorMath\src /I..\..\..\addons\ofxXMLSettings\libs /I..\..\..\addons\ofxXMLSettings\src /I..\..\..\addons\ofx3DModelLoader\src /Ibin /Isrc\addons\ofxShader\examples /Isrc\addons\ofxShader\addons /Isrc\addons\awesomium_v1.6.2_sdk_win\include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D POCO_STATIC /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt src\grabVideo.cpp
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\..\libs\openFrameworks /I..\..\..\libs\openFrameworks\graphics /I..\..\..\libs\openFrameworks\app /I..\..\..\libs\openFrameworks\sound /I..\..\..\libs\openFrameworks\utils /I..\..\..\libs\openFrameworks\communication /I..\..\..\libs\openFrameworks\video /I..\..\..\libs\openFrameworks\events /I..\..\..\libs\glut\include /I..\..\..\libs\rtAudio\include /I..\..\..\libs\quicktime\include /I..\..\..\libs\freetype\include /I..\..\..\libs\freetype\include\freetype2 /I..\..\..\libs\freeImage\include /I..\..\..\libs\fmodex\include /I..\..\..\libs\videoInput\include /I..\..\..\libs\glee\include /I..\..\..\libs\glu\include /I..\..\..\libs\poco\include /I..\..\..\addons /I..\..\..\addons\ofxNetwork\src /I..\..\..\addons\ofxDirList\src /I..\..\..\addons\ofxObjLoader\src /I..\..\..\addons\ofxOpenCv\src /I..\..\..\addons\ofxOpenCv\libs\opencv\include /I..\..\..\addons\ofxOsc\src /I..\..\..\addons\ofxOsc\libs\oscpack\include\ip /I..\..\..\addons\ofxOsc\libs\oscpack\include\osc /I..\..\..\addons\ofxThread\src /I..\..\..\addons\ofxVectorGraphics\src /I..\..\..\addons\ofxVectorGraphics\libs /I..\..\..\addons\ofxVectorMath\src /I..\..\..\addons\ofxXMLSettings\libs /I..\..\..\addons\ofxXMLSettings\src /I..\..\..\addons\ofx3DModelLoader\src /Ibin /Isrc\addons\ofxShader\examples /Isrc\addons\ofxShader\addons /Isrc\addons\awesomium_v1.6.2_sdk_win\include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D POCO_STATIC /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt src\grabVideo.cpp src\testApp.cpp
+         testApp.cpp
+     1>c:\users\tmg\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\grabvideo.h(28): warning C4005: 'NUI_SKELETON_COUNT' : macro redefinition
+                 c:\program files\microsoft sdks\kinect\v1.0\inc\nuisensor.h(98) : see previous definition of 'NUI_SKELETON_COUNT'
+     1>c:\users\tmg\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\testapp.cpp(395): warning C4995: 'sprintf': name was marked as #pragma deprecated
          grabVideo.cpp
      1>c:\users\tmg\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\grabvideo.h(28): warning C4005: 'NUI_SKELETON_COUNT' : macro redefinition
                  c:\program files\microsoft sdks\kinect\v1.0\inc\nuisensor.h(98) : see previous definition of 'NUI_SKELETON_COUNT'
      1>c:\users\tmg\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\grabvideo.cpp(115): warning C4101: 'hr_rgb_0' : unreferenced local variable
      1>c:\users\tmg\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\grabvideo.cpp(559): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+         Generating Code...
      1>c:\users\tmg\focalspace\of0062\apps\focalspace\focalspace_v1.0sdk\src\grabvideo.cpp(125): warning C4700: uninitialized local variable 'hr' used
        ManifestResourceCompile:
          All outputs are up-to-date.
@@ -85,4 +90,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.81
+Time Elapsed 00:00:06.37

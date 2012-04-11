@@ -113,7 +113,7 @@ HRESULT KinectGrabber::Kinect_Init() {
 	InitializeCriticalSection (&cs);
 	writeTurn = true;
 	HRESULT hr,hr_init_0,hr0,hr_rgb_0;
-	kinectIndex = 1;
+	kinectIndex = 0;
 	hr_init_0 = NuiCreateSensorByIndex(kinectIndex, &m_pNuiSensor);
 	m_instanceId = m_pNuiSensor->NuiDeviceConnectionId();
 

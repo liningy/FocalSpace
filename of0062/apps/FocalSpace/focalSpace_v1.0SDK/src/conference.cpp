@@ -36,7 +36,8 @@ void focusRGB(BYTE* videoBuff, USHORT* depthBuff, BYTE * focusBuff, BYTE* blurBu
 				// Use the Kinect SDK to find the color information for each pixel in the depth space
 				kinectGrabber->Kinect_ColorFromDepth(x, y, pcolorx, pcolory);
 				int index = (y * DEPTH_WIDTH) + x;
-				int	color_index = ((*pcolory*VIDEO_WIDTH) + *pcolorx);
+				int color_index = (y * DEPTH_WIDTH) + x;
+				//int	color_index = ((*pcolory*VIDEO_WIDTH) + *pcolorx);
 				
 				// focusBuff points to the r,g,b video stream
 				focusBuff[4*index + 0] = videoBuff[4*color_index + 0]; //grab the color information of a corresponding pixel from color space, and assign it to the pixel in depth image space
@@ -73,17 +74,17 @@ void focusRGB(BYTE* videoBuff, USHORT* depthBuff, BYTE * focusBuff, BYTE* blurBu
 					int headPositionX = kinectGrabber->headXValues[kinectGrabber->minDiscrepancyIdx];
 
 					if (depthBuff[index] > headPositionZ + DEPTH_THRESHOLD  || depthBuff[index] < headPositionZ - DEPTH_THRESHOLD ) {
-						blurBuff[4*index + 3] = 255; //fully opaque
+						blurBuff[4*index + 3] = 0; //fully opaque
 					} else {
-						blurBuff[4*index + 3] = 0;   //fully transparent
+						blurBuff[4*index + 3] = 255;   //fully transparent
 					}
 
 					//focus within a certain range around the active player
-					if ((x<headPositionX-180) || (x>headPositionX+180)) blurBuff[4*index + 3] = 255;
+					if ((x<headPositionX-180) || (x>headPositionX+180)) blurBuff[4*index + 3] = 0;
 
 				// If there are no detected skeletons, just fade out everything
 				} else {
-					blurBuff[4*index + 3] = 255;
+					blurBuff[4*index + 3] = 0;
 				}
 			}
 		}  

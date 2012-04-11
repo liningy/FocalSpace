@@ -66,9 +66,9 @@ void testApp::update(){
 			if(g_kinectGrabber.tryLock()) {
 				colorAlphaPixels = g_kinectGrabber.Kinect_getAlphaPixels();
 				grayPixels = (BYTE*)g_kinectGrabber.Kinect_getDepthPixels();
-				//if(colorAlphaPixels != NULL) {
-				//	texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA);
-				//}
+				if(colorAlphaPixels != NULL) {
+					texColorAlpha.loadData(colorAlphaPixels, VIDEO_WIDTH,VIDEO_HEIGHT, GL_RGBA);
+				}
 				g_kinectGrabber.unlock();
 			}
 		g_kinectGrabber.setWriteTurn(true);
@@ -217,7 +217,7 @@ void testApp::draw(){
 	ofEnableSmoothing();
 	ofEnableAlphaBlending();
 
-	int blurParam=120; //different mode has different blurParameter control
+	int blurParam=80; //different mode has different blurParameter control
 	//scaleParam=1;
 
 	if(buttonPressed[3]) {
@@ -234,22 +234,22 @@ void testApp::draw(){
 		scaleParam=sliders[2]->value;
 	}
 
-	//draw a layer entirely clear
-	texFocus.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //draw the focus texture	  //520*390
-
-	//draw another blured layer on top, with alpha(skeleton)=0;
+	//draw a blurred layer
 	blur.setBlurParams(4,(float)blurParam/100);
 	blur.beginRender();
+	texFocus.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //draw the focus texture	  //520*390
+	blur.endRender();
+	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
+
+	//draw another focused layer on top
 	if (recAndRep.getBPlayback()){
 		if(recAndRep.getBlurOn()){
-			texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
+			texBlur.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //always 0			
 		}
 	}
 	else{
-		texBlur.draw(0,0,DEPTH_WIDTH, DEPTH_HEIGHT); //always 0
+		texBlur.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //always 0	
 	}
-	blur.endRender();
-	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 
 	//draw the mobile version
 	
