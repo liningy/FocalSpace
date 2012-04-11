@@ -20,3 +20,12 @@ git merge origin/master
 
 merge help:
 http://learn.github.com/p/branching.html
+
+SWITCH BRANCHES
+git checkout branchname
+
+GO BACK TO OLD COMMITS
+(clone the entire git folder , or the newest information on git firstly)
+git checkout theCommitNumber
+(when you switch from different commit, if it meets slash, you could do:)
+git slash save
