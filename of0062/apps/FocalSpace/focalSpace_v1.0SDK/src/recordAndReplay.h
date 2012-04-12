@@ -36,6 +36,7 @@ public:
 	void drawButtons();
 	void drawSmallButtons();
 	void drawSliders();
+	void checkAndDrawGestureSignals();
 	//(records variables given to it by testApp - is called during record)
 	///
 	//playback helper functions
@@ -73,19 +74,16 @@ public:
 	bool getBRecord() {return bRecord;};
 	bool getBPlayback() {return bPlayback;};
 	bool getPaused() {return paused;};
-	void setSmallButtonActive(int newValue);
+	void toggleGoodIdeasDrawn() {goodIdeasDrawn = !goodIdeasDrawn;};
+	void toggleTalkingHeadsDrawn() {talkingHeadsDrawn = !talkingHeadsDrawn;};
+	void setGoodIdeasDrawn(bool newValue) {goodIdeasDrawn = newValue;};
+	void setTalkingHeadsDrawn(bool newValue) {talkingHeadsDrawn = newValue;};
 	bool getStopButtonActive() {return stopButtonActive;};
 	bool getReplayButtonActive() {return replayButtonActive;};
 	bool getRecordButtonActive() {return recordButtonActive;};
 	bool getGoodIdeaButtonActive() {return goodIdeaButtonActive;};
 	bool getTalkingHeadButtonActive() {return talkingHeadButtonActive;};
 	bool getPauseButtonOn() {return pauseButtonOn;};
-	bool getZeroButtonActive() {return zeroButtonActive;};
-	bool getOneButtonActive() {return oneButtonActive;};
-	bool getTwoButtonActive() {return twoButtonActive;};
-	bool getThreeButtonActive() {return threeButtonActive;};
-	bool getFourButtonActive() {return fourButtonActive;};
-	bool getFiveButtonActive() {return fiveButtonActive;};
 	//TODO: maybe change the below to use, if not null, then - otherwise print an error
 	//as of now, this function will return an unexpected value if it is called before any nextFrame call,
 	//or maybe give them default values, and explain that if no value is assigned the default will be returned
@@ -123,12 +121,7 @@ public:
 	bool getRecordButtonPressed(int x,int y) {return (*recordButton).buttonPressed(x,y);};
 	bool getGoodIdeaButtonPressed(int x,int y) {return (*goodIdeaButton).buttonPressed(x,y);};
 	bool getTalkingHeadButtonPressed(int x,int y) {return (*talkingHeadButton).buttonPressed(x,y);};
-	bool getZeroButtonPressed(int x,int y) {return (*zeroButton).buttonPressed(x,y);};
-	bool getOneButtonPressed(int x,int y) {return (*oneButton).buttonPressed(x,y);};
-	bool getTwoButtonPressed(int x,int y) {return (*twoButton).buttonPressed(x,y);};
-	bool getThreeButtonPressed(int x,int y) {return (*threeButton).buttonPressed(x,y);};
-	bool getFourButtonPressed(int x,int y) {return (*fourButton).buttonPressed(x,y);};
-	bool getFiveButtonPressed(int x,int y) {return (*fiveButton).buttonPressed(x,y);};
+
 	//gesture - since i made recAndRep be the middle man b/n tags and testApp
 	bool getBRightHandUp();
 	//blur
@@ -139,6 +132,8 @@ public:
 private:
 	int VIDEO_WIDTH; //TODO: in future can put this into one file (like "videoConstants" and use it for otehr files as well)
 	int VIDEO_HEIGHT;
+	int RENDER_WIDTH;
+	int RENDER_HEIGHT;
 
 	ofxKinectRecorder 	kinectRecorder; //accepts variables and stores them externally
 	ofxKinectPlayer 	kinectPlayer; //reads variables off of a file and returns the variables
@@ -165,13 +160,8 @@ private:
 	bool pauseButtonOn;//checks whetehr replay button should change or not (true = it should be pause)
 	bool goodIdeaButtonActive;
 	bool talkingHeadButtonActive;
-	int smallButtonActive; //only one can be active at a time (0=zero, 1=one... 7=smallGood)
-	bool zeroButtonActive;
-	bool oneButtonActive;
-	bool twoButtonActive;
-	bool threeButtonActive;
-	bool fourButtonActive;
-	bool fiveButtonActive;
+	bool goodIdeasDrawn;
+	bool talkingHeadsDrawn;
 
 	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
 		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,
@@ -191,28 +181,27 @@ private:
 	button* recordButton;
 	button* goodIdeaButton;
 	button* talkingHeadButton;
-	button* zeroButton;
-	button* oneButton;
-	button* twoButton;
-	button* threeButton;
-	button* fourButton;
-	button* fiveButton;
 	/////Button picture dimensions
 	int buttonWidth; //in pixels
 	int buttonHeight;// this and the above are the height and width for buttons (stop, record, replay and pause all have these dimensions)
 	int goodIdeaButtonWidth;
 	int goodIdeaButtonHeight;
+	int talkingHeadButtonWidth;
+	int talkingHeadButtonHeight;
 	int smallButtonHeight; //this is helpful to the second slider that skips to where you click (but below the main slider)
 	int smallButtonWidth;
-	///// Small Button variables & helpers
+	///// Small (and Big) Button variables & helpers
 	ofImage smallGoodImg;
-	ofImage smallZeroImg;
-	ofImage smallOneImg;
-	ofImage smallTwoImg;
-	ofImage smallThreeImg;
-	ofImage smallFourImg;
-	ofImage smallFiveImg;
+	ofImage smallPZeroImg;
+	ofImage smallPOneImg;
+	ofImage smallPTwoImg;
+	ofImage smallPThreeImg;
+	ofImage smallPFourImg;
+	ofImage smallPFiveImg;
+	ofImage smallPImgs[6]; //stores the images for the small person icons;
 	ofImage tempSmallImg; 
+	ofImage bigGoodImg;
+	int bigTimer;
 	int tempButtonX;
 	int rhrIndex; //the index of the index after the last currently  filled slot in the small RHRLocations array
 	int maxNoIndices;
@@ -222,7 +211,10 @@ private:
 	static const int lenGesArray = 10;  //the max of each kind of gesture of audio allowable (this variable should be the same as the one with the same name in tags)
 
 	double xOneSquared, yOneSquared, xTwoSquared, yTwoSquared; //helps with skipToNextFaceID
+	double fox, foy, ftx, fty;
 	double xOneDiff, yOneDiff, xTwoDiff, yTwoDiff;
+	double radiusOne, radiusTwo; //helps in skipToFaceAt
+
 	/////Sliders
 	slider* timer;
 	slider* secondSlider; //(right below first and with similar parameters). Use: To be able to click on gesture symols and stuff
@@ -235,8 +227,6 @@ private:
 	int timerHeight; //replay timer height
 	float timerProgression; //the fraction (currFrame/nFrames)
 	bool bRightHandUp;
-
-	double minRadius; //helps in skipToFaceAt
 };
 
 #endif

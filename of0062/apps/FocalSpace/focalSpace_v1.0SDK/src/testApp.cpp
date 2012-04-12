@@ -75,6 +75,7 @@ void testApp::update(){
 		}
 		time(&rawTime);
 		g_kinectGrabber.getJointsPoints(); // Gets the skeleton joints' positions (up to rightHandPY)
+		/*these do most recently tracked player, not current player? current is done with closest id later
 		headPositionX=g_kinectGrabber.headJoints_x;
 		headPositionY=g_kinectGrabber.headJoints_y;
 		headPositionZ=g_kinectGrabber.headJoints_z;
@@ -85,7 +86,7 @@ void testApp::update(){
 		leftHandPX = g_kinectGrabber.handLeft_x;
 		leftHandPY = g_kinectGrabber.handLeft_y;
 		rightHandPX = g_kinectGrabber.handRight_x;
-		rightHandPY = g_kinectGrabber.handRight_y;
+		rightHandPY = g_kinectGrabber.handRight_y;*/
 		depthBuff = g_kinectGrabber.Kinect_getDepthBuffer();
 	}
 	timeinfo = localtime (&rawTime );
@@ -150,7 +151,19 @@ void testApp::update(){
 	//printf("skeleton tracked?: %s",	(g_kinectGrabber.isSkeletonTracked)? "true":"false");
 	//printf("-------------------------------------------\n"); 
 
-	
+	if (!recAndRep.getBPlayback()){//to get skeleton info from closest id
+		headPositionX=g_kinectGrabber.headXValues[closestID]; //these two are done above
+		headPositionY=g_kinectGrabber.headYValues[closestID];
+		headPositionZ=g_kinectGrabber.headZValues[closestID];
+		leftShoulderX = g_kinectGrabber.leftShoulderXValues[closestID];
+		leftShoulderY = g_kinectGrabber.leftShoulderYValues[closestID];
+		rightShoulderX = g_kinectGrabber.rightShoulderXValues[closestID];
+		rightShoulderY = g_kinectGrabber.rightShoulderYValues[closestID];
+		leftHandPX = g_kinectGrabber.leftHandXValues[closestID];
+		leftHandPY = g_kinectGrabber.leftHandYValues[closestID];
+		rightHandPX = g_kinectGrabber.rightHandXValues[closestID];
+		rightHandPY = g_kinectGrabber.rightHandYValues[closestID];
+	}
 	if(buttonPressed[1]) focusRGB(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],maskValue, closestID, personSpeaking);	
 	else if(buttonPressed[2] && !confirmSelection) focusRGB_manual(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],translateMouseX,translateMouseY);	
 	else if(buttonPressed[2] && confirmSelection)  focusRGB_manualLocked(colorAlphaPixels, depthBuff, focusPixels, blurPixels, &g_kinectGrabber,buttonPressed[3],buttonPressed[4],buttonPressed[5],lockedPersonID);	
@@ -158,13 +171,13 @@ void testApp::update(){
 	update_mobile();
 	texFocus.loadData(focusPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
 	if (recAndRep.getBPlayback()){//not sure if the if's below are imprtant any more
-		if(recAndRep.getBlurOn()){
-			texBlur.loadData(recAndRep.getBlurPixels(),DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
-		}
+	//	if(recAndRep.getBlurOn()){
+		texBlur.loadData(recAndRep.getBlurPixels(),DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
+	/*	}
 		else{
 			texBlur.loadData(recAndRep.getColorAlphaPixels(),DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);//color alpha is same as focus i think
 			//texBlur.loadData(focusPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);//color alpha is same as focus i think
-		}
+		}*/
 	}
 	else{
 		texBlur.loadData(blurPixels,DEPTH_WIDTH,DEPTH_HEIGHT, GL_RGBA);
@@ -242,14 +255,14 @@ void testApp::draw(){
 	blur.draw(0+533, 0+105, RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam, true);
 
 	//draw another focused layer on top
-	if (recAndRep.getBPlayback()){
+	/*if (recAndRep.getBPlayback()){
 		if(recAndRep.getBlurOn()){
 			texBlur.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //always 0			
 		}
 	}
-	else{
-		texBlur.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //always 0	
-	}
+	else{*/
+	texBlur.draw(0+533,0+105,RENDER_WIDTH*scaleParam, RENDER_HEIGHT*scaleParam); //always 0	
+	//}
 
 	//draw the mobile version
 	
@@ -297,13 +310,17 @@ void testApp::draw(){
 		recAndRep.drawSliders();
 
 		//Lining of currentTime=
-		if (recAndRep.getBRightHandUp()){//make func for this in recadnrep
+		/*if (recAndRep.getBRightHandUp()){//make func for this in recadnrep
 			ofCircle(60,VIDEO_HEIGHT - 20,20);
 			printf("hands up detected");
-		}
+		}*/
 		recAndRep.drawSmallButtons();
+		recAndRep.checkAndDrawGestureSignals();//MODDED410
 	}
-	ofCircle( g_kinectGrabber.headXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.headYValues[closestID]*SCALE+105,10);
+	if (recAndRep.getBRecord()){
+		ofCircle( g_kinectGrabber.headXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.headYValues[closestID]*SCALE+105,10);
+		ofCircle( g_kinectGrabber.rightHandXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.rightHandYValues[closestID]*SCALE+105,10);
+	}
 	//draw skeleton
 	/*
 	ofCircle(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,10);
@@ -470,28 +487,13 @@ void testApp::mousePressed(int x, int y, int button){
 		recAndRep.standardRecord();
 	}
 	else if (recAndRep.getBPlayback() && clickedOnVideo(x,y)){
-		recAndRep.skipToFaceAt(x,y);
+		recAndRep.skipToFaceAt(translateMouseX,translateMouseY);
 	}
 	else if (recAndRep.getGoodIdeaButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(7);
+		recAndRep.toggleGoodIdeasDrawn();
 	}
-	else if (recAndRep.getZeroButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(0);
-	}
-	else if (recAndRep.getOneButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(1);
-	}
-	else if (recAndRep.getTwoButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(2);
-	}
-	else if (recAndRep.getThreeButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(3);
-	}
-	else if (recAndRep.getFourButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(4);
-	}
-	else if (recAndRep.getFiveButtonPressed(x,y)){
-		recAndRep.setSmallButtonActive(5);
+	else if (recAndRep.getTalkingHeadButtonPressed(x,y)){
+		recAndRep.toggleTalkingHeadsDrawn();
 	}
 	else if (recAndRep.getTimerSliderPressed(x,y).first){
 		if (recAndRep.getBPlayback()){
