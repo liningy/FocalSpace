@@ -317,10 +317,10 @@ void testApp::draw(){
 		recAndRep.drawSmallButtons();
 		recAndRep.checkAndDrawGestureSignals();//MODDED410
 	}
-	if (recAndRep.getBRecord()){
+	/*if (recAndRep.getBRecord()){ POSSIBLY UNCOMMENT
 		ofCircle( g_kinectGrabber.headXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.headYValues[closestID]*SCALE+105,10);
 		ofCircle( g_kinectGrabber.rightHandXValues[closestID]*SCALE+RENDER_WIDTH, g_kinectGrabber.rightHandYValues[closestID]*SCALE+105,10);
-	}
+	}*/
 	//draw skeleton
 	/*
 	ofCircle(headPositionX*SCALE+RENDER_WIDTH,headPositionY*SCALE+105,10);
@@ -348,11 +348,11 @@ void testApp::draw(){
 		buttonPressed[5]=true;
 	}
 	//talk bubble
-	for(int i=0;i<nBubbles;i++) talkBubbles[i]->draw();
+	/*for(int i=0;i<nBubbles;i++) talkBubbles[i]->draw(); UNCOMMENT
 	ofDisableAlphaBlending();	
 	//unlock KinectGrabber
 	g_kinectGrabber.unlock();
-	g_kinectGrabber.setWriteTurn(true);
+	g_kinectGrabber.setWriteTurn(true);*/
 	
 }
 //-------------------------------------------------------------
@@ -494,6 +494,14 @@ void testApp::mousePressed(int x, int y, int button){
 	}
 	else if (recAndRep.getTalkingHeadButtonPressed(x,y)){
 		recAndRep.toggleTalkingHeadsDrawn();
+	}
+	else if (recAndRep.getDemoVideoButtonPressed(x,y)){
+		if (!recAndRep.getDemoVideoMode()){
+			recAndRep.enterDemoVideoMode();
+		}
+		else{
+			recAndRep.exitDemoVideoMode();
+		}
 	}
 	else if (recAndRep.getTimerSliderPressed(x,y).first){
 		if (recAndRep.getBPlayback()){

@@ -1,4 +1,4 @@
-﻿Build started 4/12/2012 5:25:24 PM.
+﻿Build started 4/12/2012 7:23:47 PM.
      1>Project "C:\Users\Tony\FocalSpace\of0062\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "obj\Debug\openframeworksLib.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -14,4 +14,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.07
+Time Elapsed 00:00:00.06

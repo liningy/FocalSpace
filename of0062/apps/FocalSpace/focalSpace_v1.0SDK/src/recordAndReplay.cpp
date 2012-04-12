@@ -32,10 +32,12 @@ void recordAndReplay::init(){
 	//Button Variables
 	buttonWidth = 104; //in pixels
 	buttonHeight = 81;
-	goodIdeaButtonWidth = 93;
-	goodIdeaButtonHeight = 63;
+	goodIdeaButtonWidth = 69; //was 93
+	goodIdeaButtonHeight = 72; //wa 63
 	talkingHeadButtonWidth = 78;
 	talkingHeadButtonHeight = 72;
+	demoVideoButtonWidth = 78;
+	demoVideoButtonHeight = 72;
 	smallButtonHeight = 25; //this is helpful to the second slider that skips to where you click (but below the main slider)
 	smallButtonWidth = 22; //this helps in making the "good idea button" range lines
 	stopButtonActive = false;
@@ -46,6 +48,7 @@ void recordAndReplay::init(){
 	talkingHeadButtonActive = false;
 	goodIdeasDrawn = false;
 	talkingHeadsDrawn = false;
+	demoVideoMode = false;
 	smallGoodImg.loadImage("images\\r_small.png");
 	smallPZeroImg.loadImage("images\\smallp_1.png");
 	smallPOneImg.loadImage("images\\smallp_2.png");
@@ -65,8 +68,10 @@ void recordAndReplay::init(){
 	stopButton = new button("Stop", VIDEO_WIDTH - buttonWidth - hButtonOffset , VIDEO_HEIGHT + 50 , buttonWidth, buttonHeight, stopButtonActive, "images\\r_stop_disable.png", "images\\r_stop.png");
 	replayButton = new button("Replay", VIDEO_WIDTH - hButtonOffset, VIDEO_HEIGHT + 50, buttonWidth, buttonHeight, replayButtonActive, "images\\r_pause.png", "images\\r_replay.png");
 	recordButton = new button("Record", VIDEO_WIDTH + buttonWidth - hButtonOffset, VIDEO_HEIGHT + 50 , buttonWidth, buttonHeight, recordButtonActive, "images\\r_record_disable.png", "images\\r_record.png");
-	goodIdeaButton = new button("Good Idea", 57 , 809 , goodIdeaButtonWidth, goodIdeaButtonHeight, goodIdeaButtonActive, "images\\r_good.png", "images\\r_good.png");
-	talkingHeadButton = new button("Talking heads", 142 , 809 , talkingHeadButtonWidth, talkingHeadButtonHeight, talkingHeadButtonActive, "images\\person_01.png", "images\\person_01.png");
+	goodIdeaButton = new button("Good Idea", 57 , 809 , goodIdeaButtonWidth, goodIdeaButtonHeight, goodIdeaButtonActive, "images\\r_good_disabled.png", "images\\r_good.png");
+	talkingHeadButton = new button("Talking heads", 142 , 809 , talkingHeadButtonWidth, talkingHeadButtonHeight, talkingHeadButtonActive, "images\\person_01_disabled.png", "images\\person_01.png");
+	demoVideoButton = new button("Demo Video", 236 , 809 , demoVideoButtonWidth, demoVideoButtonHeight, true, "images\\demo_01_disabled.png", "images\\demo_01.png");
+	//Note: demoVideoMode is always active, demoVideoButtonActive just determines whether to draw with the main picture or the alternate picture
 	//Slider variables
 	lastPlaybackTime = 0;
 	firstPlaybackTime = 0;
@@ -182,7 +187,12 @@ void recordAndReplay::startPlayback() {
 	if (bRecord){
 		stopRecording();  //stop recording if starting playback
 	}
-	kinectPlayer.setup(ofToDataPath("recording.dat"), ofToDataPath("recordingInfo.dat"), true); // set record file and source
+	if (!demoVideoMode){
+		kinectPlayer.setup(ofToDataPath("recording.dat"), ofToDataPath("recordingInfo.dat"), true); // set record file and source
+	}
+	else{
+		kinectPlayer.setup(ofToDataPath("demoVideo.dat"), ofToDataPath("demoVideoInfo.dat"), true); // set record file and source
+	}
 	kinectPlayer.loop();
 	getPlaybackRange();
 	if (bPlayback && paused){//if already playing, unpause
@@ -230,7 +240,12 @@ void recordAndReplay::safeResetLiveMode(){//intended to wrok if you're already i
 	(*timer).setSliderPosX(timerProgression*timerWidth);
 	stopButtonActive = false;
 	replayButtonActive = true;
-	recordButtonActive = true;
+	if (!demoVideoMode){
+		recordButtonActive = true;
+	}
+	else{
+		recordButtonActive = false;
+	}
 	goodIdeaButtonActive = false;
 	talkingHeadButtonActive=false;
 	pauseButtonOn = false;
@@ -337,7 +352,12 @@ void recordAndReplay::standardStop(){
 			stopRecording();
 			stopButtonActive = false;
 			replayButtonActive = true;
-			recordButtonActive = true;
+			if (!demoVideoMode){
+				recordButtonActive = true;
+			}
+			else{
+				recordButtonActive = false;
+			}
 			goodIdeaButtonActive = false;
 			talkingHeadButtonActive=false;
 			pauseButtonOn = false;
@@ -349,7 +369,12 @@ void recordAndReplay::standardStop(){
 			stopPlayback();
 			stopButtonActive = false;
 			replayButtonActive = true;
-			recordButtonActive = true;
+			if (!demoVideoMode){
+				recordButtonActive = true;
+			}
+			else{
+				recordButtonActive = false;
+			}
 			goodIdeaButtonActive = false;
 			talkingHeadButtonActive=false;
 			pauseButtonOn = false;
@@ -402,6 +427,20 @@ void recordAndReplay::standardRecord(){
 		setTalkingHeadsDrawn(false);
 		updateButtonTriggers();
 }
+
+void recordAndReplay::enterDemoVideoMode(){
+	demoVideoMode = true;
+	demoVideoButtonActive = true;//this bool is always true, but it may be changed
+	standardStop();
+	standardReplay();
+	safeResetReplayMode();
+}
+void recordAndReplay::exitDemoVideoMode(){
+	demoVideoMode = false;
+	demoVideoButtonActive = true;
+	standardStop();
+	safeResetLiveMode();
+}
 void recordAndReplay::updateButtonTriggers(){
 	(*stopButton).trigger = stopButtonActive;
 	(*replayButton).trigger = replayButtonActive;
@@ -409,6 +448,7 @@ void recordAndReplay::updateButtonTriggers(){
 	(*goodIdeaButton).trigger = goodIdeaButtonActive;
 	(*talkingHeadButton).trigger = talkingHeadButtonActive; //lining
 	
+	//demoVideoButton trigger doesn't need to be edited because it is always true
 	//note, small buttons don't need to be updated because they are made the moment before drawing them
 }
 void recordAndReplay::drawButtons(){
@@ -418,9 +458,10 @@ void recordAndReplay::drawButtons(){
 	(*recordButton).drawFontwithAltPic(recordButtonActive);
 	(*goodIdeaButton).drawFontwithAltPic(goodIdeaButtonActive);
 	(*talkingHeadButton).drawFontwithAltPic(talkingHeadButtonActive);
+	(*demoVideoButton).drawFontwithAltPic(demoVideoButtonActive);
 }
 void recordAndReplay::drawSliders(){
-	(*timer).drawSliderasPic(0, 1);//unsure what the variables do!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	(*timer).drawSliderasPic(0, 1);//unsure what the variables do!!!!!!!!!!!!!!!
 }
 void recordAndReplay::checkAndDrawGestureSignals(){
 	if (bRecord){

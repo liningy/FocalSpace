@@ -58,6 +58,8 @@ public:
 	void standardStop(); //stops playback/recording and changes variables that inform buttons whether they should be active or not
 	void standardReplay(); //replays saved files and changes variables that inform buttons whether they should be active or not
 	void standardRecord();
+	void enterDemoVideoMode();
+	void exitDemoVideoMode();
 	void updateButtonTriggers(); //informs buttons whether they should be active or not
 	//========================================================================
 
@@ -70,20 +72,22 @@ public:
 	float currSoundPos;
 	
 	//========================================================================
-	//GETTERS
-	bool getBRecord() {return bRecord;};
-	bool getBPlayback() {return bPlayback;};
-	bool getPaused() {return paused;};
+	//SETTERS AND TOGGLERS
 	void toggleGoodIdeasDrawn() {goodIdeasDrawn = !goodIdeasDrawn;};
 	void toggleTalkingHeadsDrawn() {talkingHeadsDrawn = !talkingHeadsDrawn;};
 	void setGoodIdeasDrawn(bool newValue) {goodIdeasDrawn = newValue;};
 	void setTalkingHeadsDrawn(bool newValue) {talkingHeadsDrawn = newValue;};
+	//GETTERS
+	bool getBRecord() {return bRecord;};
+	bool getBPlayback() {return bPlayback;};
+	bool getPaused() {return paused;};
 	bool getStopButtonActive() {return stopButtonActive;};
 	bool getReplayButtonActive() {return replayButtonActive;};
 	bool getRecordButtonActive() {return recordButtonActive;};
 	bool getGoodIdeaButtonActive() {return goodIdeaButtonActive;};
 	bool getTalkingHeadButtonActive() {return talkingHeadButtonActive;};
 	bool getPauseButtonOn() {return pauseButtonOn;};
+	bool getDemoVideoMode() {return demoVideoMode;};
 	//TODO: maybe change the below to use, if not null, then - otherwise print an error
 	//as of now, this function will return an unexpected value if it is called before any nextFrame call,
 	//or maybe give them default values, and explain that if no value is assigned the default will be returned
@@ -121,6 +125,7 @@ public:
 	bool getRecordButtonPressed(int x,int y) {return (*recordButton).buttonPressed(x,y);};
 	bool getGoodIdeaButtonPressed(int x,int y) {return (*goodIdeaButton).buttonPressed(x,y);};
 	bool getTalkingHeadButtonPressed(int x,int y) {return (*talkingHeadButton).buttonPressed(x,y);};
+	bool getDemoVideoButtonPressed(int x,int y) {return (*demoVideoButton).buttonPressed(x,y);};
 
 	//gesture - since i made recAndRep be the middle man b/n tags and testApp
 	bool getBRightHandUp();
@@ -160,9 +165,10 @@ private:
 	bool pauseButtonOn;//checks whetehr replay button should change or not (true = it should be pause)
 	bool goodIdeaButtonActive;
 	bool talkingHeadButtonActive;
+	bool demoVideoButtonActive;
 	bool goodIdeasDrawn;
 	bool talkingHeadsDrawn;
-
+	bool demoVideoMode;
 	pair<unsigned char *,pair<unsigned char *,pair<time_t,pair<int,pair<int,pair<int,pair<int,
 		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,
 		pair<int,pair<int,pair<int,pair<int,pair<int,pair<int,pair<USHORT*,pair<unsigned char *,int>>>>>>>>>>>>>>>>>>>>>>>> rgbdepthpair;//variable that accepts the variables that kinectPlayer sends
@@ -181,6 +187,7 @@ private:
 	button* recordButton;
 	button* goodIdeaButton;
 	button* talkingHeadButton;
+	button* demoVideoButton;
 	/////Button picture dimensions
 	int buttonWidth; //in pixels
 	int buttonHeight;// this and the above are the height and width for buttons (stop, record, replay and pause all have these dimensions)
@@ -188,6 +195,8 @@ private:
 	int goodIdeaButtonHeight;
 	int talkingHeadButtonWidth;
 	int talkingHeadButtonHeight;
+	int demoVideoButtonWidth;
+	int demoVideoButtonHeight;
 	int smallButtonHeight; //this is helpful to the second slider that skips to where you click (but below the main slider)
 	int smallButtonWidth;
 	///// Small (and Big) Button variables & helpers
